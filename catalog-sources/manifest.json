@@ -1,0 +1,83 @@
+{
+  "version": "2026.10.28",
+  "retrievedAt": "2026-10-28",
+  "sources": [
+    {
+      "file": "paints-vallejo.md",
+      "url": "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md",
+      "revision": "22791a682e1d155da388f4f856cd7196cd9f2677",
+      "sha256": "4361edf9117e8a5e4b3c97304f18ba73607ec2edb59e91c1c76f4a1a68b60a3f",
+      "license": "MIT"
+    },
+    {
+      "file": "paints-ak.md",
+      "url": "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md",
+      "revision": "22791a682e1d155da388f4f856cd7196cd9f2677",
+      "sha256": "82c50ab4a7853ce67219e31567cbf1de28b30685fb63e80e72020de8561b5302",
+      "license": "MIT"
+    },
+    {
+      "file": "paints-army.md",
+      "url": "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md",
+      "revision": "22791a682e1d155da388f4f856cd7196cd9f2677",
+      "sha256": "7bcb5b8cc039e03fc1fad38288770a990ee00cad6be343f84b30d6df4efacde8",
+      "license": "MIT"
+    },
+    {
+      "file": "paints-citadel.md",
+      "url": "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md",
+      "revision": "22791a682e1d155da388f4f856cd7196cd9f2677",
+      "sha256": "f04054e9eb77d5226c56690440fa4b455fc6557eb511ad55d1ae585adb8125a2",
+      "license": "MIT"
+    },
+    {
+      "file": "bambulab.json",
+      "url": "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/bambulab.json",
+      "revision": "9d53d28703ba1bcc97ab504e069d437ae2053c5a",
+      "sha256": "8f7ade48d3bb5642438d66ad8c8745d3aaf0f5addc5050cbe34e87e2f91beec4",
+      "license": "MIT"
+    },
+    {
+      "file": "esun.json",
+      "url": "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/esun.json",
+      "revision": "9d53d28703ba1bcc97ab504e069d437ae2053c5a",
+      "sha256": "04d552db7c3fa8644db059289339f7eb0e56fb0f28786137e47b37a2ba37286f",
+      "license": "MIT"
+    },
+    {
+      "file": "polymaker.json",
+      "url": "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/polymaker.json",
+      "revision": "9d53d28703ba1bcc97ab504e069d437ae2053c5a",
+      "sha256": "3bda9f7977bfbe95200315ad0478903956cfeec5e8fb920ef40d97a56d95033b",
+      "license": "MIT"
+    },
+    {
+      "file": "prusament.json",
+      "url": "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/prusament.json",
+      "revision": "9d53d28703ba1bcc97ab504e069d437ae2053c5a",
+      "sha256": "7045ba48ae5dee71732bd1d12c14418dc3b7cf570e3742d5821dfcf5845803c9",
+      "license": "MIT"
+    },
+    {
+      "file": "sunlu.json",
+      "url": "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/sunlu.json",
+      "revision": "9d53d28703ba1bcc97ab504e069d437ae2053c5a",
+      "sha256": "1fe51b9bc33ebd26036985b9d134a1b243f171c7bd50b36fab514bc42486931b",
+      "license": "MIT"
+    },
+    {
+      "file": "paints-license.txt",
+      "url": "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/LICENSE",
+      "revision": "22791a682e1d155da388f4f856cd7196cd9f2677",
+      "sha256": "7a32b9083db527fda55c4b3d1c13bd87dddf73c935928d126f7cd3dda9c96a3b",
+      "license": "MIT"
+    },
+    {
+      "file": "filament-license.txt",
+      "url": "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/LICENSE",
+      "revision": "9d53d28703ba1bcc97ab504e069d437ae2053c5a",
+      "sha256": "0e32583112190cdace7fcba056c3ccadc1e4952b6fa0f6210c8e6faa8048411e",
+      "license": "MIT"
+    }
+  ]
+}

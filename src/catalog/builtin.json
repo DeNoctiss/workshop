@@ -1,0 +1,2162 @@
+[
+  {
+    "id": "mp-d7a2d8b0c274295f",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Amaranth Red",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.829",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#D14E30"
+  },
+  {
+    "id": "mp-a0d6a0bf47378779",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Andrea Blue",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.841",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#0270AF"
+  },
+  {
+    "id": "mp-1aa3ff08910298e6",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Azure",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.902",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#5B6B9E"
+  },
+  {
+    "id": "mp-8f940bd0de40b51d",
+    "source": "builtin",
+    "category": "paint",
+    "name": "BC Dark Brown",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.768",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#76563D"
+  },
+  {
+    "id": "mp-91c8194406209910",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Basalt Grey",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.869",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#5C5A5D"
+  },
+  {
+    "id": "mp-924c0b6f3149a4f4",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Basic Skin Tone",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.815",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#E9AC8D"
+  },
+  {
+    "id": "mp-ec3688491b1dcd47",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Beige",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.917",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#DFBE6F"
+  },
+  {
+    "id": "mp-c648e21121cab092",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Beige Brown",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.875",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#816041"
+  },
+  {
+    "id": "mp-acf1c45ca74fb18e",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Beige Red",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.804",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#B06E4B"
+  },
+  {
+    "id": "mp-6e60265b6f5b6e12",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Black",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.950",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#231D1D"
+  },
+  {
+    "id": "mp-2b206f4cb28426e6",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Black Glaze",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.855",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#383838"
+  },
+  {
+    "id": "mp-7d85ec0daa990087",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Black Green",
+    "brand": "Vallejo",
+    "series": "Model Color",
+    "sku": "70.980",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Vallejo.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#2A342B"
+  },
+  {
+    "id": "mp-5b5931871c942539",
+    "source": "builtin",
+    "category": "paint",
+    "name": "3b Au/zb Au",
+    "brand": "AK Interactive",
+    "series": "AFV (3rd Gen)",
+    "sku": "AK11387",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#1F2211"
+  },
+  {
+    "id": "mp-4c3d0fc622968d24",
+    "source": "builtin",
+    "category": "paint",
+    "name": "A-14 Interior Steel Grey",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11911",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#637174"
+  },
+  {
+    "id": "mp-0ce66b6ba93b81bd",
+    "source": "builtin",
+    "category": "paint",
+    "name": "A-18f Light Grey-blue",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11912",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#83A398"
+  },
+  {
+    "id": "mp-182ed9ac5331569f",
+    "source": "builtin",
+    "category": "paint",
+    "name": "A-19f Grass Green",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11913",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#52643A"
+  },
+  {
+    "id": "mp-470c8ef94db9cc4d",
+    "source": "builtin",
+    "category": "paint",
+    "name": "A-21m Light Yellowish Brown",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11914",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#8F8762"
+  },
+  {
+    "id": "mp-6cd5efcabc9d37e0",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Adc Grey Fs 16473",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11867",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#9FAAA6"
+  },
+  {
+    "id": "mp-f8054786261b77af",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Ae-9/aii Light Grey",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11908",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#D3D4CE"
+  },
+  {
+    "id": "mp-9a0792ff7003b4b9",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Aggressor Blue Fs 35109",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11877",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#3B6C71"
+  },
+  {
+    "id": "mp-e12ebb83fd28d6e3",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Aggressor Grey Fs 36251",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11885",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#818284"
+  },
+  {
+    "id": "mp-079d1c67184a069a",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Aii Green",
+    "brand": "AK Interactive",
+    "series": "Air (3rd Gen)",
+    "sku": "AK11909",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/AK.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#323D1B"
+  },
+  {
+    "id": "mp-09d3faf422db5cee",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Abomination Gore",
+    "brand": "The Army Painter",
+    "series": "Warpaints",
+    "sku": "WP1401",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#A32F26"
+  },
+  {
+    "id": "mp-67886fc023a4770f",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Abyssal Blue",
+    "brand": "The Army Painter",
+    "series": "Warpaints Fanatic",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#00506C"
+  },
+  {
+    "id": "mp-1752f667832c2fd9",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Aegis Aqua",
+    "brand": "The Army Painter",
+    "series": "Warpaints Fanatic",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#32B3D5"
+  },
+  {
+    "id": "mp-86c8daeffa953c0d",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Afterglow",
+    "brand": "The Army Painter",
+    "series": "Warpaints Fanatic",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#E4EA8D"
+  },
+  {
+    "id": "mp-f2098350d595e4af",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Agate Skin",
+    "brand": "The Army Painter",
+    "series": "Warpaints Fanatic",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#D7877B"
+  },
+  {
+    "id": "mp-27839e3bb0d86656",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Alien Purple",
+    "brand": "The Army Painter",
+    "series": "Warpaints Fanatic",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#6154A3"
+  },
+  {
+    "id": "mp-79acce1f007819e3",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Alien Purple",
+    "brand": "The Army Painter",
+    "series": "Warpaints Primer",
+    "sku": "CP3019",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#492B79"
+  },
+  {
+    "id": "mp-dcc92b268775748c",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Alien Purple",
+    "brand": "The Army Painter",
+    "series": "Warpaints Air",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#3D2560"
+  },
+  {
+    "id": "mp-2408cd4193ed5971",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Alien Purple",
+    "brand": "The Army Painter",
+    "series": "Warpaints",
+    "sku": "WP1128",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#462D59"
+  },
+  {
+    "id": "mp-f2cc45a2e5cc117e",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Alpha Blue",
+    "brand": "The Army Painter",
+    "series": "Warpaints Fanatic",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Army_Painter.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#667DC0"
+  },
+  {
+    "id": "mp-62b01abfdb8f596c",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Abaddon Black",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#000000"
+  },
+  {
+    "id": "mp-84724177ca5b60a6",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Averland Sunset",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#FBB81C"
+  },
+  {
+    "id": "mp-1c9d2baa4bd86e1c",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Balthasar Gold",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#A77353"
+  },
+  {
+    "id": "mp-5f4409bb44d1b32c",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Barak-Nar Burgundy",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#451636"
+  },
+  {
+    "id": "mp-6abc3055aa79d3f7",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Bugman Glow",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#804C43"
+  },
+  {
+    "id": "mp-63766dbad53f172d",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Caledor Sky",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#366699"
+  },
+  {
+    "id": "mp-c724bf4759aef32f",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Caliban Green",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#003D15"
+  },
+  {
+    "id": "mp-e826876686a630e9",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Castellan Green",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#264715"
+  },
+  {
+    "id": "mp-fcabd6c55df64c4a",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Catachan Fleshtone",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#442B25"
+  },
+  {
+    "id": "mp-3664b11205c162fd",
+    "source": "builtin",
+    "category": "paint",
+    "name": "Celestra Grey",
+    "brand": "Citadel",
+    "series": "Base",
+    "sku": "",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "paint"
+    },
+    "urls": [
+      "https://github.com/Arcturus5404/miniature-paints/blob/22791a682e1d155da388f4f856cd7196cd9f2677/paints/Citadel_Colour.md"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Rick Fleuren (2022)",
+    "colorHex": "#8BA3A3"
+  },
+  {
+    "id": "sp-6c986bd20272cc3e",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA Jade White",
+    "brand": "Bambu Lab",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.24
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/bambulab.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#FFFFFF",
+    "colorName": "Jade White"
+  },
+  {
+    "id": "sp-68fb77db5a40d230",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA Beige",
+    "brand": "Bambu Lab",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.24
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/bambulab.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#F7E6DE",
+    "colorName": "Beige"
+  },
+  {
+    "id": "sp-fd66895b5c160b5d",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA Matte Ivory White",
+    "brand": "Bambu Lab",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.31
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/bambulab.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#FFFFFF",
+    "colorName": "Ivory White"
+  },
+  {
+    "id": "sp-0e54178fc4441d9a",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA Matte Latte Brown",
+    "brand": "Bambu Lab",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.31
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/bambulab.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#D3B7A7",
+    "colorName": "Latte Brown"
+  },
+  {
+    "id": "sp-58789057e3818319",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA Tough+ Yellow",
+    "brand": "Bambu Lab",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.21
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/bambulab.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#F4D53F",
+    "colorName": "Yellow"
+  },
+  {
+    "id": "sp-0f16509316137205",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA Tough+ White",
+    "brand": "Bambu Lab",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.21
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/bambulab.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#FFFFFF",
+    "colorName": "White"
+  },
+  {
+    "id": "sp-5f5eee066276f05f",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA-Basic Orange",
+    "brand": "eSun",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.24
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/esun.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#FDA42E",
+    "colorName": "Orange"
+  },
+  {
+    "id": "sp-f09b56ab04cbf005",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA-Basic Concrete Grey",
+    "brand": "eSun",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.24
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/esun.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#B3B3B3",
+    "colorName": "Concrete Grey"
+  },
+  {
+    "id": "sp-a98e563ad7f7f345",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA Wood",
+    "brand": "eSun",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.1
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/esun.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#EBCFA7",
+    "colorName": "Wood"
+  },
+  {
+    "id": "sp-3a72320b43e77dc8",
+    "source": "builtin",
+    "category": "filament",
+    "name": "ePLA-Silk Lime",
+    "brand": "eSun",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.21
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/esun.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#A7E51E",
+    "colorName": "Lime"
+  },
+  {
+    "id": "sp-01e4ea79b9076f64",
+    "source": "builtin",
+    "category": "filament",
+    "name": "ePLA-Silk Jacinth",
+    "brand": "eSun",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.21
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/esun.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#EE422A",
+    "colorName": "Jacinth"
+  },
+  {
+    "id": "sp-4ed46532a73a8f3a",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA-Silk Mystic GOLD BLUE PURPLE",
+    "brand": "eSun",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.23
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/esun.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#3F409A",
+    "colorName": "GOLD BLUE PURPLE"
+  },
+  {
+    "id": "sp-4f4c44f7a36c7fab",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PolyFlex™ TPU90 Black",
+    "brand": "Polymaker",
+    "series": "TPU",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-750-0",
+        "label": "750.0 г",
+        "qty": 750.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "TPU",
+      "diameter": 1.75,
+      "density": 1.12,
+      "nozzleMin": 210,
+      "nozzleMax": 230,
+      "bedMin": 25,
+      "bedMax": 60
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/polymaker.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#101820",
+    "colorName": "Black"
+  },
+  {
+    "id": "sp-7a7a4a196c845459",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PolyFlex™ TPU90 White",
+    "brand": "Polymaker",
+    "series": "TPU",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-750-0",
+        "label": "750.0 г",
+        "qty": 750.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "TPU",
+      "diameter": 1.75,
+      "density": 1.12,
+      "nozzleMin": 210,
+      "nozzleMax": 230,
+      "bedMin": 25,
+      "bedMax": 60
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/polymaker.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#FFFFFF",
+    "colorName": "White"
+  },
+  {
+    "id": "sp-695f5a97d11fd006",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PolyFlex™ TPU95 Black",
+    "brand": "Polymaker",
+    "series": "TPU",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-750-0",
+        "label": "750.0 г",
+        "qty": 750.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "TPU",
+      "diameter": 1.75,
+      "density": 1.22,
+      "nozzleMin": 210,
+      "nozzleMax": 230,
+      "bedMin": 25,
+      "bedMax": 60
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/polymaker.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#101820",
+    "colorName": "Black"
+  },
+  {
+    "id": "sp-77538029a30f4f20",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PolyFlex™ TPU95 White",
+    "brand": "Polymaker",
+    "series": "TPU",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-750-0",
+        "label": "750.0 г",
+        "qty": 750.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "TPU",
+      "diameter": 1.75,
+      "density": 1.22,
+      "nozzleMin": 210,
+      "nozzleMax": 230,
+      "bedMin": 25,
+      "bedMax": 60
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/polymaker.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#FFFFFF",
+    "colorName": "White"
+  },
+  {
+    "id": "sp-909275bd33ec1d19",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PolyFlex™ TPU95-HF Black",
+    "brand": "Polymaker",
+    "series": "TPU",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "TPU",
+      "diameter": 1.75,
+      "density": 1.16,
+      "nozzleMin": 200,
+      "nozzleMax": 220,
+      "bedMin": 25,
+      "bedMax": 50
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/polymaker.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#101820",
+    "colorName": "Black"
+  },
+  {
+    "id": "sp-17b57c37668506ab",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PolyFlex™ TPU95-HF White",
+    "brand": "Polymaker",
+    "series": "TPU",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "TPU",
+      "diameter": 1.75,
+      "density": 1.16,
+      "nozzleMin": 200,
+      "nozzleMax": 220,
+      "bedMin": 25,
+      "bedMax": 50
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/polymaker.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#FFFFFF",
+    "colorName": "White"
+  },
+  {
+    "id": "sp-e7485201c87c21dd",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PETG Matte Black",
+    "brand": "Prusament",
+    "series": "PETG",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PETG",
+      "diameter": 1.75,
+      "density": 1.27,
+      "nozzleMin": 240,
+      "nozzleMax": 260,
+      "bedMin": 70,
+      "bedMax": 90
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/prusament.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#303635",
+    "colorName": "Matte Black"
+  },
+  {
+    "id": "sp-f6599d3d850aff2d",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PETG Anthracite Grey",
+    "brand": "Prusament",
+    "series": "PETG",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PETG",
+      "diameter": 1.75,
+      "density": 1.27,
+      "nozzleMin": 240,
+      "nozzleMax": 260,
+      "bedMin": 70,
+      "bedMax": 90
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/prusament.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#3F4646",
+    "colorName": "Anthracite Grey"
+  },
+  {
+    "id": "sp-4146f47f4ce51890",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PETG Prusa Orange",
+    "brand": "Prusament",
+    "series": "PETG",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-2000-0",
+        "label": "2000.0 г",
+        "qty": 2000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PETG",
+      "diameter": 1.75,
+      "density": 1.27,
+      "nozzleMin": 240,
+      "nozzleMax": 260,
+      "bedMin": 70,
+      "bedMax": 90
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/prusament.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#EB5403",
+    "colorName": "Prusa Orange"
+  },
+  {
+    "id": "sp-130ba0155d34ebea",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PETG Jet Black",
+    "brand": "Prusament",
+    "series": "PETG",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-2000-0",
+        "label": "2000.0 г",
+        "qty": 2000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PETG",
+      "diameter": 1.75,
+      "density": 1.27,
+      "nozzleMin": 240,
+      "nozzleMax": 260,
+      "bedMin": 70,
+      "bedMax": 90
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/prusament.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#292B2B",
+    "colorName": "Jet Black"
+  },
+  {
+    "id": "sp-4b775b38a9b6cef7",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PETG Carmine Red Transparent",
+    "brand": "Prusament",
+    "series": "PETG",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PETG",
+      "diameter": 1.75,
+      "density": 1.27,
+      "nozzleMin": 240,
+      "nozzleMax": 260,
+      "bedMin": 70,
+      "bedMax": 90
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/prusament.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#B5422F",
+    "colorName": "Carmine Red Transparent"
+  },
+  {
+    "id": "sp-6ef6f89226a954cc",
+    "source": "builtin",
+    "category": "filament",
+    "name": "ASA Natural",
+    "brand": "Prusament",
+    "series": "ASA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-850-0",
+        "label": "850.0 г",
+        "qty": 850.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "ASA",
+      "diameter": 1.75,
+      "density": 1.07,
+      "nozzleMin": 250,
+      "nozzleMax": 270,
+      "bedMin": 105,
+      "bedMax": 115
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/prusament.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#D6D6CB",
+    "colorName": "Natural"
+  },
+  {
+    "id": "sp-ffcd262902de7559",
+    "source": "builtin",
+    "category": "filament",
+    "name": "ASA Black",
+    "brand": "Sunlu",
+    "series": "ASA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "ASA",
+      "diameter": 1.75,
+      "density": 1.04,
+      "nozzleMin": 250,
+      "nozzleMax": 280,
+      "bedMin": 80,
+      "bedMax": 100
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/sunlu.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#000000",
+    "colorName": "Black"
+  },
+  {
+    "id": "sp-0053b463a3ad25b9",
+    "source": "builtin",
+    "category": "filament",
+    "name": "ASA Natural",
+    "brand": "Sunlu",
+    "series": "ASA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1000 г",
+        "qty": 1000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "ASA",
+      "diameter": 1.75,
+      "density": 1.04,
+      "nozzleMin": 250,
+      "nozzleMax": 280,
+      "bedMin": 80,
+      "bedMax": 100
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/sunlu.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#F4F2EB",
+    "colorName": "Natural"
+  },
+  {
+    "id": "sp-1facde0c98220267",
+    "source": "builtin",
+    "category": "filament",
+    "name": "TPU Silk Cream White",
+    "brand": "Sunlu",
+    "series": "TPU",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "TPU",
+      "diameter": 1.75,
+      "density": 1.21,
+      "bedMin": 50,
+      "bedMax": 60
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/sunlu.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#F9F4E2",
+    "colorName": "Cream White"
+  },
+  {
+    "id": "sp-ab8a2b1aab6d072f",
+    "source": "builtin",
+    "category": "filament",
+    "name": "TPU Silk Black",
+    "brand": "Sunlu",
+    "series": "TPU",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "TPU",
+      "diameter": 1.75,
+      "density": 1.21,
+      "bedMin": 50,
+      "bedMax": 60
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/sunlu.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#1D1C1B",
+    "colorName": "Black"
+  },
+  {
+    "id": "sp-ecbd50936334d2b5",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA White (Glow Green)",
+    "brand": "Sunlu",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.23
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/sunlu.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#DCEABE",
+    "colorName": "White (Glow Green)"
+  },
+  {
+    "id": "sp-1d8687df3fdf0fcb",
+    "source": "builtin",
+    "category": "filament",
+    "name": "PLA White (Glow Blue)",
+    "brand": "Sunlu",
+    "series": "PLA",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000-0",
+        "label": "1000.0 г",
+        "qty": 1000.0,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "filament",
+      "polymer": "PLA",
+      "diameter": 1.75,
+      "density": 1.23
+    },
+    "urls": [
+      "https://github.com/Donkie/SpoolmanDB/blob/9d53d28703ba1bcc97ab504e069d437ae2053c5a/filaments/sunlu.json"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "MIT · Donkie (2024)",
+    "colorHex": "#F1F4ED",
+    "colorName": "White (Glow Blue)"
+  },
+  {
+    "id": "official-elegoo-standard-v2-grey",
+    "source": "builtin",
+    "category": "resin",
+    "name": "Standard V2.0 Grey",
+    "brand": "ELEGOO",
+    "series": "Standard V2.0",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1 кг",
+        "qty": 1000,
+        "unit": "g"
+      },
+      {
+        "id": "g-2000",
+        "label": "2 кг",
+        "qty": 2000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "resin",
+      "resinType": "standard",
+      "wavelength": 405
+    },
+    "urls": [
+      "https://www.elegoo.com/collections/resin/products/elegoo-standard-resin-v-2-0"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены",
+    "colorName": "Grey"
+  },
+  {
+    "id": "official-elegoo-standard-v2-black",
+    "source": "builtin",
+    "category": "resin",
+    "name": "Standard V2.0 Black",
+    "brand": "ELEGOO",
+    "series": "Standard V2.0",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1 кг",
+        "qty": 1000,
+        "unit": "g"
+      },
+      {
+        "id": "g-2000",
+        "label": "2 кг",
+        "qty": 2000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "resin",
+      "resinType": "standard",
+      "wavelength": 405
+    },
+    "urls": [
+      "https://www.elegoo.com/collections/resin/products/elegoo-standard-resin-v-2-0"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены",
+    "colorName": "Black"
+  },
+  {
+    "id": "official-elegoo-standard-v2-white",
+    "source": "builtin",
+    "category": "resin",
+    "name": "Standard V2.0 White",
+    "brand": "ELEGOO",
+    "series": "Standard V2.0",
+    "sku": "",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "g-1000",
+        "label": "1 кг",
+        "qty": 1000,
+        "unit": "g"
+      },
+      {
+        "id": "g-2000",
+        "label": "2 кг",
+        "qty": 2000,
+        "unit": "g"
+      }
+    ],
+    "properties": {
+      "kind": "resin",
+      "resinType": "standard",
+      "wavelength": 405
+    },
+    "urls": [
+      "https://www.elegoo.com/collections/resin/products/elegoo-standard-resin-v-2-0"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены",
+    "colorName": "White"
+  },
+  {
+    "id": "official-vallejo-primer-70-600",
+    "source": "builtin",
+    "category": "primer",
+    "name": "White",
+    "brand": "Vallejo",
+    "series": "Surface Primer",
+    "sku": "70.600",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "primer"
+    },
+    "urls": [
+      "https://acrylicosvallejo.com/wp-content/uploads/2025/10/Catalogo_2026-R02.pdf"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены",
+    "colorName": "White"
+  },
+  {
+    "id": "official-vallejo-primer-70-601",
+    "source": "builtin",
+    "category": "primer",
+    "name": "Grey",
+    "brand": "Vallejo",
+    "series": "Surface Primer",
+    "sku": "70.601",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "primer"
+    },
+    "urls": [
+      "https://acrylicosvallejo.com/wp-content/uploads/2025/10/Catalogo_2026-R02.pdf"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены",
+    "colorName": "Grey"
+  },
+  {
+    "id": "official-vallejo-primer-70-602",
+    "source": "builtin",
+    "category": "primer",
+    "name": "Black",
+    "brand": "Vallejo",
+    "series": "Surface Primer",
+    "sku": "70.602",
+    "aliases": [],
+    "packages": [],
+    "properties": {
+      "kind": "primer"
+    },
+    "urls": [
+      "https://acrylicosvallejo.com/wp-content/uploads/2025/10/Catalogo_2026-R02.pdf"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены",
+    "colorName": "Black"
+  },
+  {
+    "id": "official-vallejo-varnish-26-650",
+    "source": "builtin",
+    "category": "varnish",
+    "name": "Глянцевый Polyurethane Varnish",
+    "brand": "Vallejo",
+    "series": "Polyurethane",
+    "sku": "26.650",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "ml-60",
+        "label": "60 мл",
+        "qty": 60,
+        "unit": "ml"
+      }
+    ],
+    "properties": {
+      "kind": "varnish",
+      "finish": "Глянцевый",
+      "application": "Кисть / аэрограф"
+    },
+    "urls": [
+      "https://acrylicosvallejo.com/wp-content/uploads/2025/10/Catalogo_2026-R02.pdf"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены"
+  },
+  {
+    "id": "official-vallejo-varnish-26-651",
+    "source": "builtin",
+    "category": "varnish",
+    "name": "Матовый Polyurethane Varnish",
+    "brand": "Vallejo",
+    "series": "Polyurethane",
+    "sku": "26.651",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "ml-60",
+        "label": "60 мл",
+        "qty": 60,
+        "unit": "ml"
+      }
+    ],
+    "properties": {
+      "kind": "varnish",
+      "finish": "Матовый",
+      "application": "Кисть / аэрограф"
+    },
+    "urls": [
+      "https://acrylicosvallejo.com/wp-content/uploads/2025/10/Catalogo_2026-R02.pdf"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены"
+  },
+  {
+    "id": "official-vallejo-varnish-26-652",
+    "source": "builtin",
+    "category": "varnish",
+    "name": "Сатиновый Polyurethane Varnish",
+    "brand": "Vallejo",
+    "series": "Polyurethane",
+    "sku": "26.652",
+    "aliases": [],
+    "packages": [
+      {
+        "id": "ml-60",
+        "label": "60 мл",
+        "qty": 60,
+        "unit": "ml"
+      }
+    ],
+    "properties": {
+      "kind": "varnish",
+      "finish": "Сатиновый",
+      "application": "Кисть / аэрограф"
+    },
+    "urls": [
+      "https://acrylicosvallejo.com/wp-content/uploads/2025/10/Catalogo_2026-R02.pdf"
+    ],
+    "checkedAt": "2026-10-28",
+    "datasetVersion": "2026.10.28",
+    "license": "Фактические сведения производителя; изображения и описания не включены"
+  }
+]
