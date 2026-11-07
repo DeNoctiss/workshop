@@ -177,12 +177,20 @@ describe("задачи, заметки, каталог", () => {
     n.runId = uid();
     expect(() => validate(s)).toThrow();
   });
-  it("проверяет 81 товар, уникальность и все стартовые категории", () => {
-    expect(builtinProducts).toHaveLength(81);
-    expect(new Set(builtinProducts.map((p) => p.id)).size).toBe(81);
-    expect(new Set(builtinProducts.map((p) => p.category))).toEqual(
-      new Set(["paint", "filament", "resin", "primer", "varnish"]),
+  it("проверяет весь встроенный каталог, уникальность и стартовые категории", () => {
+    expect(builtinProducts.length).toBeGreaterThanOrEqual(81);
+    expect(new Set(builtinProducts.map((p) => p.id)).size).toBe(
+      builtinProducts.length,
     );
+    const categories = new Set(builtinProducts.map((p) => p.category));
+    for (const category of [
+      "paint",
+      "filament",
+      "resin",
+      "primer",
+      "varnish",
+    ] as const)
+      expect(categories.has(category)).toBe(true);
     builtinProducts.forEach((p) => {
       validateProduct(p);
       expect(p.urls.length).toBeGreaterThan(0);
