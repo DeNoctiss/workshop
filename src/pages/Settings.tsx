@@ -6,6 +6,15 @@ import { emptyState, type Settings as SettingsType } from "../domain/model";
 import { mutate, replaceAll, snapshot } from "../data/db";
 import { encodeBackup, decodeBackup, download } from "../data/backup";
 export async function exportBackup() {
+  if (
+    typeof window !== "undefined" &&
+    !window.dispatchEvent(
+      new Event("workshop-before-backup", { cancelable: true }),
+    )
+  )
+    throw new Error(
+      "Сначала сохраните открытые изменения и дождитесь записи доски, затем повторите резервное копирование.",
+    );
   const { state, assets } = await snapshot();
   download(
     await encodeBackup(state, assets),
@@ -50,7 +59,7 @@ export function Settings() {
               onClick={() =>
                 void act(
                   exportBackup,
-                  "Резервная копия подготовлена к скачиванию",
+                  "ZIP передан браузеру. Проверьте, что файл появился в загрузках.",
                 )
               }
             >
@@ -83,8 +92,9 @@ export function Settings() {
             </label>
           </div>
           <p className="muted">
-            Последняя выгрузка: {date(state.settings.backupAt)}. Импорт до 150
-            МБ ZIP / 300 МБ распакованных данных. Объединение баз не
+            После нажатия «Скачать ZIP» проверьте файл в загрузках браузера:
+            приложение не может подтвердить его запись на диск. Импорт до 150 МБ
+            ZIP / 300 МБ распакованных данных. Объединение баз не
             поддерживается.
           </p>
         </section>

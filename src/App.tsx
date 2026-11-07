@@ -59,6 +59,7 @@ export default function App() {
       action: () => Promise<unknown>;
     } | null>(null);
   const working = useRef(false),
+    routeRef = useRef(route),
     refreshVersion = useRef(0);
   async function refresh() {
     const version = ++refreshVersion.current;
@@ -77,7 +78,18 @@ export default function App() {
   useEffect(() => {
     void refresh();
     const hash = () => {
-      setRoute(location.hash.slice(2) || "projects");
+      const next = location.hash.slice(2) || "projects";
+      if (
+        next !== routeRef.current &&
+        !window.dispatchEvent(
+          new Event("workshop-before-route", { cancelable: true }),
+        )
+      ) {
+        location.hash = "/" + routeRef.current;
+        return;
+      }
+      routeRef.current = next;
+      setRoute(next);
       setMenu(false);
       window.scrollTo(0, 0);
     };
@@ -201,7 +213,7 @@ export default function App() {
               onClick={() =>
                 void act(
                   exportBackup,
-                  "Резервная копия подготовлена к скачиванию",
+                  "ZIP передан браузеру. Проверьте, что файл появился в загрузках.",
                 )
               }
             >
@@ -222,9 +234,23 @@ export default function App() {
             <div>
               <span>Моя мастерская</span>
               <span className="slash">/</span>
-              <strong>
-                {navigation.find(([key]) => key === page)?.[1] || "Проекты"}
-              </strong>
+              {page === "board" && id ? (
+                <>
+                  <a
+                    className="topbar-project-link"
+                    href={"#/projects/" + id}
+                    title={state.projects.find((p) => p.id === id)?.title}
+                  >
+                    {state.projects.find((p) => p.id === id)?.title || "Проект"}
+                  </a>
+                  <span className="slash">/</span>
+                  <strong>Доска</strong>
+                </>
+              ) : (
+                <strong>
+                  {navigation.find(([key]) => key === page)?.[1] || "Проекты"}
+                </strong>
+              )}
             </div>
             <small>
               <span className="online-dot" />

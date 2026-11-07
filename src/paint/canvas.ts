@@ -1,10 +1,15 @@
 import { normalizeHex } from "./core/color";
-import type { Point } from "./core/selection";
+import type { MaskRect, Point } from "./core/selection";
 import { uid, type Asset } from "../domain/model";
 import type { PaintLayer } from "../domain/workspace";
 export interface WorkingLayer extends Omit<PaintLayer, "maskAssetId"> {
   mask: Uint8Array;
 }
+export type PaintCacheEntry = {
+  mask: Uint8Array;
+  color: string;
+  canvas: HTMLCanvasElement;
+};
 export function canvas(w: number, h: number) {
   const c = document.createElement("canvas");
   c.width = w;
@@ -18,34 +23,54 @@ export function maskCanvas(
   color = "#ffffff",
   alpha?: Uint8ClampedArray,
 ) {
+  const c = canvas(w, h);
+  updateMaskCanvasRegion(
+    c,
+    mask,
+    w,
+    { left: 0, top: 0, right: w, bottom: h },
+    color,
+    alpha,
+  );
+  return c;
+}
+export function updateMaskCanvasRegion(
+  target: HTMLCanvasElement,
+  mask: Uint8Array,
+  w: number,
+  rect: MaskRect,
+  color: string,
+  alpha?: Uint8ClampedArray,
+) {
   const normalized = normalizeHex(color);
   if (!normalized) throw new Error("Укажите цвет в формате #RRGGBB");
   color = normalized;
-  const c = canvas(w, h),
-    ctx = c.getContext("2d")!,
-    im = ctx.createImageData(w, h),
+  const width = Math.max(0, rect.right - rect.left),
+    height = Math.max(0, rect.bottom - rect.top);
+  if (!width || !height) return;
+  const ctx = target.getContext("2d")!,
+    im = ctx.createImageData(width, height),
     rgb = [1, 3, 5].map((i) => parseInt(color.slice(i, i + 2), 16));
-  for (let i = 0; i < mask.length; i++) {
-    const k = i * 4;
-    im.data[k] = rgb[0];
-    im.data[k + 1] = rgb[1];
-    im.data[k + 2] = rgb[2];
-    im.data[k + 3] = alpha
-      ? Math.round((mask[i] * alpha[k + 3]) / 255)
-      : mask[i];
-  }
-  ctx.putImageData(im, 0, 0);
-  return c;
+  for (let y = rect.top; y < rect.bottom; y++)
+    for (let x = rect.left; x < rect.right; x++) {
+      const i = y * w + x,
+        k = i * 4,
+        local = ((y - rect.top) * width + x - rect.left) * 4;
+      im.data[local] = rgb[0];
+      im.data[local + 1] = rgb[1];
+      im.data[local + 2] = rgb[2];
+      im.data[local + 3] = alpha
+        ? Math.round((mask[i] * alpha[k + 3]) / 255)
+        : mask[i];
+    }
+  ctx.putImageData(im, rect.left, rect.top);
 }
 const opaqueBases = new WeakMap<HTMLCanvasElement, HTMLCanvasElement>();
 export function paintComposite(
   base: HTMLCanvasElement,
   layers: WorkingLayer[],
   target = canvas(base.width, base.height),
-  cache?: Map<
-    string,
-    { mask: Uint8Array; color: string; canvas: HTMLCanvasElement }
-  >,
+  cache?: Map<string, PaintCacheEntry>,
 ) {
   if (cache) {
     const ids = new Set(layers.map((l) => l.id));

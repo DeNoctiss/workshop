@@ -1,5 +1,5 @@
 import { labPixels } from "./core/color";
-import { selectColor, growMask } from "./core/selection";
+import { selectColorProtected, growMask } from "./core/selection";
 import { featherMask } from "./mask";
 let pixels: Uint8ClampedArray,
   width: number,
@@ -13,18 +13,24 @@ self.onmessage = (e: MessageEvent) => {
       width = m.width;
       height = m.height;
       labs = labPixels(pixels);
+      self.postMessage({ type: "ready" });
       return;
     }
-    const mask =
+    const result =
       m.type === "refine"
-        ? featherMask(
-            growMask(m.mask, width, height, m.grow),
-            width,
-            height,
-            m.feather,
-          )
-        : selectColor(pixels, width, height, m.point, m.options, labs);
-    self.postMessage({ id: m.id, mask }, { transfer: [mask.buffer] });
+        ? {
+            mask: featherMask(
+              growMask(m.mask, width, height, m.grow),
+              width,
+              height,
+              m.feather,
+            ),
+          }
+        : selectColorProtected(pixels, width, height, m.point, m.options, labs);
+    self.postMessage(
+      { id: m.id, ...result },
+      { transfer: [result.mask.buffer] },
+    );
   } catch (error) {
     self.postMessage({ id: m.id, error: String(error) });
   }

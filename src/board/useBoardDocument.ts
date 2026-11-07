@@ -103,6 +103,13 @@ export function useBoardDocument(projectId: string) {
     const hide = () => {
       if (document.visibilityState === "hidden") void persist();
     };
+    const backup = (e: Event) => {
+      if (dirty.current || saving.current || pending.current.size) {
+        e.preventDefault();
+        if (alive.current)
+          setError("Сначала дождитесь сохранения доски перед выгрузкой ZIP.");
+      }
+    };
     const navigate = (e: MouseEvent) => {
       const a = (e.target as Element).closest<HTMLAnchorElement>(
         'a[href^="#/"]',
@@ -117,11 +124,13 @@ export function useBoardDocument(projectId: string) {
       }
     };
     window.addEventListener("beforeunload", before);
+    window.addEventListener("workshop-before-backup", backup);
     document.addEventListener("visibilitychange", hide);
     document.addEventListener("click", navigate, true);
     return () => {
       alive.current = false;
       window.removeEventListener("beforeunload", before);
+      window.removeEventListener("workshop-before-backup", backup);
       document.removeEventListener("visibilitychange", hide);
       document.removeEventListener("click", navigate, true);
       void persist();

@@ -24,6 +24,55 @@ export function absolutePosition(n: BoardNode, nodes: BoardNode[]) {
     y: n.position.y + (p?.position.y ?? 0),
   };
 }
+/** Find a visible-card-sized free spot without moving existing board nodes. */
+export function findFreePosition(
+  nodes: BoardNode[],
+  preferred: { x: number; y: number },
+  size: { width: number; height: number },
+) {
+  const gap = 20;
+  const occupied = nodes.map((n) => ({
+    ...absolutePosition(n, nodes),
+    width: Number(n.style?.width) || n.measured?.width || 280,
+    height: Number(n.style?.height) || n.measured?.height || 260,
+  }));
+  const free = (x: number, y: number) =>
+    occupied.every(
+      (box) =>
+        x + size.width + gap <= box.x ||
+        box.x + box.width + gap <= x ||
+        y + size.height + gap <= box.y ||
+        box.y + box.height + gap <= y,
+    );
+  const stepX = size.width + gap;
+  const stepY = size.height + gap;
+  const limit = Math.ceil(Math.sqrt(nodes.length)) + 4;
+  for (let ring = 0; ring <= limit; ring++) {
+    const offsets = ring
+      ? [
+          { x: ring, y: 0 },
+          { x: 0, y: ring },
+          { x: -ring, y: 0 },
+          { x: 0, y: -ring },
+          ...Array.from({ length: 2 * ring + 1 }, (_, i) => i - ring).flatMap(
+            (x) =>
+              Array.from({ length: 2 * ring + 1 }, (_, i) => i - ring)
+                .filter((y) => Math.max(Math.abs(x), Math.abs(y)) === ring)
+                .map((y) => ({ x, y })),
+          ),
+        ]
+      : [{ x: 0, y: 0 }];
+    for (const offset of offsets) {
+      const x = preferred.x + offset.x * stepX;
+      const y = preferred.y + offset.y * stepY;
+      if (free(x, y)) return { x, y };
+    }
+  }
+  return {
+    x: Math.max(preferred.x, ...occupied.map((box) => box.x + box.width + gap)),
+    y: preferred.y,
+  };
+}
 export function groupNodes(b: ProjectBoard, ids: string[]): ProjectBoard {
   const chosen = b.nodes.filter(
     (n) => ids.includes(n.id) && n.data.kind !== "group",

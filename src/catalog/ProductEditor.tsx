@@ -112,7 +112,7 @@ export function ProductEditor({
             type="checkbox"
             checked={p.colorHex !== undefined}
             onChange={(e) =>
-              patch({ colorHex: e.target.checked ? "#78857b" : undefined })
+              patch({ colorHex: e.target.checked ? "" : undefined })
             }
           />
           Указать примерный цвет
@@ -123,17 +123,23 @@ export function ProductEditor({
               aria-label="Выбор цвета"
               type="color"
               value={
-                /^#[0-9a-f]{6}$/i.test(p.colorHex) ? p.colorHex : "#78857b"
+                /^#[0-9a-f]{6}$/i.test(p.colorHex) ? p.colorHex : "#ffffff"
               }
               onChange={(e) => patch({ colorHex: e.target.value })}
             />
             <Field label="HEX (ориентир)">
               <input
+                required
                 pattern="#[0-9a-fA-F]{6}"
                 value={p.colorHex}
                 onChange={(e) => patch({ colorHex: e.target.value })}
               />
             </Field>
+            {!p.colorHex && (
+              <small className="muted">
+                Выберите оттенок или введите HEX перед сохранением.
+              </small>
+            )}
           </div>
         )}
         <details className="form-section" open>
