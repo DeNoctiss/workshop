@@ -65,116 +65,169 @@ export function Projects() {
           ? readiness(s, a).cost - readiness(s, b).cost
           : b.updatedAt.localeCompare(a.updatedAt),
     );
+  const firstProject = s.projects.length === 0;
+  const inView = s.projects.some((p) => p.archived === archive);
+  const resetFilters = () => {
+    setQuery("");
+    setTech("");
+    setStatus("");
+    setPrinter("");
+  };
   return (
     <>
       <Header
         title="Проекты"
         description="Ваши изделия, рецепты и всё необходимое для следующего запуска."
       >
-        <button className="primary" onClick={() => setEdit(newProject())}>
-          <Plus size={18} />
-          Новый проект
-        </button>
-      </Header>
-      <div className="info-strip">
-        <Layers size={23} />
-        <span>
-          Изделия{" "}
-          <strong>{s.projects.filter((p) => !p.archived).length}</strong>
-        </span>
-        <span>
-          Активные производства{" "}
-          <strong>{s.runs.filter((r) => !closed(r)).length}</strong>
-        </span>
-        <a href="#/materials">
-          Перейти к запасам <ArrowUpRight size={16} />
-        </a>
-      </div>
-      <div className="toolbar">
-        <div className="search">
-          <Search size={18} />
-          <input
-            placeholder="Найти проект или тег…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
-        <select
-          aria-label="Технология"
-          value={tech}
-          onChange={(e) => setTech(e.target.value)}
-        >
-          <option value="">Все технологии</option>
-          <option>FDM</option>
-          <option>SLA</option>
-        </select>
-        <select
-          aria-label="Статус проекта"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">Любой статус</option>
-          <option value="ready">Готов к запуску</option>
-          <option value="active">В производстве</option>
-          <option value="short">Требуются материалы</option>
-          <option value="draft">Черновик</option>
-        </select>
-        <select
-          aria-label="Принтер"
-          value={printer}
-          onChange={(e) => setPrinter(e.target.value)}
-        >
-          <option value="">Все принтеры</option>
-          {s.printers.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-        <select
-          aria-label="Сортировка"
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
-        >
-          <option value="updated">Сначала обновлённые</option>
-          <option value="name">По названию</option>
-          <option value="cost">По себестоимости</option>
-        </select>
-        <div className="segmented">
-          <button
-            aria-label="Плитка"
-            className={!list ? "selected" : ""}
-            onClick={() => setList(false)}
-          >
-            <LayoutGrid size={18} />
-          </button>
-          <button
-            aria-label="Список"
-            className={list ? "selected" : ""}
-            onClick={() => setList(true)}
-          >
-            <List size={18} />
-          </button>
-        </div>
-      </div>
-      <div className="section-head">
-        <span className="muted">{items.length} проектов</span>
-        <label className="check">
-          <input
-            type="checkbox"
-            checked={archive}
-            onChange={(e) => setArchive(e.target.checked)}
-          />
-          Архив
-        </label>
-      </div>
-      {!items.length ? (
-        <Empty title="Начнём с первого изделия">
-          <p>Добавьте принтер и материалы, затем сохраните рецепт проекта.</p>
+        {!firstProject && (
           <button className="primary" onClick={() => setEdit(newProject())}>
             <Plus size={18} />
-            Создать проект
+            Новый проект
           </button>
+        )}
+      </Header>
+      {!firstProject && (
+        <div className="info-strip">
+          <Layers size={23} />
+          <span>
+            Изделия{" "}
+            <strong>{s.projects.filter((p) => !p.archived).length}</strong>
+          </span>
+          <span>
+            Активные производства{" "}
+            <strong>{s.runs.filter((r) => !closed(r)).length}</strong>
+          </span>
+          <a href="#/materials">
+            Перейти к запасам <ArrowUpRight size={16} />
+          </a>
+        </div>
+      )}
+      {!firstProject && (
+        <div className="toolbar">
+          <div className="search">
+            <Search size={18} />
+            <input
+              placeholder="Найти проект или тег…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+          <select
+            aria-label="Технология"
+            value={tech}
+            onChange={(e) => setTech(e.target.value)}
+          >
+            <option value="">Все технологии</option>
+            <option>FDM</option>
+            <option>SLA</option>
+          </select>
+          <select
+            aria-label="Статус проекта"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="">Любой статус</option>
+            <option value="ready">Готов к запуску</option>
+            <option value="active">В производстве</option>
+            <option value="short">Требуются материалы</option>
+            <option value="draft">Черновик</option>
+          </select>
+          <select
+            aria-label="Принтер"
+            value={printer}
+            onChange={(e) => setPrinter(e.target.value)}
+          >
+            <option value="">Все принтеры</option>
+            {s.printers.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+          <select
+            aria-label="Сортировка"
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+          >
+            <option value="updated">Сначала обновлённые</option>
+            <option value="name">По названию</option>
+            <option value="cost">По себестоимости</option>
+          </select>
+          <div className="segmented">
+            <button
+              aria-label="Плитка"
+              className={!list ? "selected" : ""}
+              onClick={() => setList(false)}
+            >
+              <LayoutGrid size={18} />
+            </button>
+            <button
+              aria-label="Список"
+              className={list ? "selected" : ""}
+              onClick={() => setList(true)}
+            >
+              <List size={18} />
+            </button>
+          </div>
+        </div>
+      )}
+      {!firstProject && (
+        <div className="section-head">
+          <span className="muted">{items.length} проектов</span>
+          <label className="check">
+            <input
+              type="checkbox"
+              checked={archive}
+              onChange={(e) => setArchive(e.target.checked)}
+            />
+            Архив
+          </label>
+        </div>
+      )}
+      {!items.length ? (
+        <Empty
+          title={
+            firstProject
+              ? "Начнём с первого изделия"
+              : inView
+                ? "Ничего не найдено"
+                : archive
+                  ? "Архив пуст"
+                  : "Нет активных проектов"
+          }
+        >
+          {firstProject ? (
+            <>
+              <p>
+                Создайте рецепт проекта. Принтер и материалы можно добавить
+                позже.
+              </p>
+              <button className="primary" onClick={() => setEdit(newProject())}>
+                <Plus size={18} /> Создать проект
+              </button>
+            </>
+          ) : inView ? (
+            <>
+              <p>Измените поиск или фильтры, чтобы увидеть проекты.</p>
+              <button onClick={resetFilters}>Сбросить фильтры</button>
+            </>
+          ) : (
+            <>
+              <p>
+                {archive
+                  ? "Архивных проектов пока нет."
+                  : "Все проекты находятся в архиве."}
+              </p>
+              <button
+                onClick={() => {
+                  resetFilters();
+                  setArchive(!archive);
+                }}
+              >
+                {archive ? "Показать активные" : "Открыть архив"}
+              </button>
+            </>
+          )}
         </Empty>
       ) : (
         <Paged className={list ? "project-list" : "cards"}>

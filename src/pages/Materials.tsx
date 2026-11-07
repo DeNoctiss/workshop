@@ -85,6 +85,59 @@ export function Materials({
     setAmount(type === "receipt" ? m.packageQty : stock(s, m.id).physical);
     setNote("");
   };
+  const materialActions = (m: Material) => (
+    <div className="actions material-actions">
+      {inventory ? (
+        <button onClick={() => open(m, "inventory")}>Сверить</button>
+      ) : (
+        <>
+          <button
+            className="icon"
+            title="Пополнить"
+            aria-label={"Пополнить " + m.name}
+            onClick={() => open(m, "receipt")}
+          >
+            <PackagePlus size={17} />
+          </button>
+          <button
+            className="icon"
+            title="Редактировать"
+            aria-label={"Редактировать " + m.name}
+            onClick={() => setEdit(structuredClone(m))}
+          >
+            <Pencil size={17} />
+          </button>
+        </>
+      )}
+      <button
+        className="icon"
+        title="История"
+        aria-label={"История " + m.name}
+        onClick={() => open(m, "history")}
+      >
+        <History size={17} />
+      </button>
+      <button
+        className="icon"
+        title={m.archived ? "Вернуть из архива" : "Архивировать"}
+        aria-label={"Архив " + m.name}
+        onClick={() =>
+          confirm(
+            m.archived ? "Вернуть материал?" : "В архив?",
+            "История и рецепты сохранятся. Архивный материал недоступен для новых запусков.",
+            () =>
+              mutate((d) => {
+                if (stock(d, m.id).reserved > 0)
+                  throw new Error("Сначала завершите активные производства");
+                d.materials.find((x) => x.id === m.id)!.archived = !m.archived;
+              }),
+          )
+        }
+      >
+        <Archive size={17} />
+      </button>
+    </div>
+  );
   return (
     <>
       <Header
@@ -208,160 +261,180 @@ export function Materials({
           </p>
         </Empty>
       ) : (
-        <PagedTable
-          head={
-            <>
-              <tr>
-                <th>Материал</th>
-                <th>Цвет</th>
-                <th>На складе</th>
-                <th>Резерв</th>
-                <th>Доступно</th>
-                <th>Порог пополнения</th>
-                <th>Статус</th>
-                <th>{inventory ? "Последняя сверка" : "Цена / ед."}</th>
-                <th>Действия</th>
-              </tr>
-            </>
-          }
-        >
-          {items.map((m) => {
-            const v = stockHealth(s, m);
-            return (
-              <tr key={m.id}>
-                <td>
-                  <div className="material-name">
-                    <MaterialKind category={m.category} />
-                    <div>
-                      <strong>{m.name}</strong>
-                      <small>
-                        {[m.brand, m.series, m.code]
-                          .filter(Boolean)
-                          .join(" · ")}{" "}
-                      </small>
+        <div className="materials-list">
+          <PagedTable
+            className="materials-table"
+            head={
+              <>
+                <tr>
+                  <th>Материал</th>
+                  <th>Цвет</th>
+                  <th>На складе</th>
+                  <th>Резерв</th>
+                  <th>Доступно</th>
+                  <th>Порог пополнения</th>
+                  <th>Статус</th>
+                  <th>{inventory ? "Последняя сверка" : "Цена / ед."}</th>
+                  <th>Действия</th>
+                </tr>
+              </>
+            }
+          >
+            {items.map((m) => {
+              const v = stockHealth(s, m);
+              return (
+                <tr key={m.id}>
+                  <td>
+                    <div className="material-name">
+                      <MaterialKind category={m.category} />
+                      <div>
+                        <strong>{m.name}</strong>
+                        <small>
+                          {[m.brand, m.series, m.code]
+                            .filter(Boolean)
+                            .join(" · ")}{" "}
+                        </small>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className="material-color">
-                  {m.colorEnabled !== false && m.color ? (
-                    <span
-                      className="swatch"
-                      style={{ background: m.color }}
-                      title={m.color}
-                    />
-                  ) : (
-                    <span className="muted">—</span>
-                  )}
-                </td>
-                <td>
-                  {qty(v.physical)} {units[m.unit]}
-                  {m.unit === "ml" && <small>примерно</small>}
-                </td>
-                <td>{qty(v.reserved)}</td>
-                <td>
-                  <strong>{qty(v.available)}</strong>
-                </td>
-                <td>{qty(m.minimum)}</td>
-                <td>
-                  <Badge
-                    tone={
-                      v.level === "critical"
-                        ? "danger"
-                        : v.level === "warning"
-                          ? "warning"
-                          : "success"
-                    }
-                  >
-                    {v.available < 0
-                      ? "Дефицит резерва"
-                      : v.level === "critical"
-                        ? "Пополнить"
-                        : v.level === "warning"
-                          ? "Скоро закончится"
-                          : "В норме"}
-                  </Badge>
-                  <div
-                    className={"stock-meter " + v.level}
-                    role="meter"
-                    aria-label="Доступный запас относительно упаковки"
-                    aria-valuenow={Math.min(100, v.percent)}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-valuetext={Math.round(v.percent) + "% упаковки"}
-                  >
-                    <i style={{ width: Math.min(100, v.percent) + "%" }} />
-                  </div>
-                  <small>{Math.round(v.percent)}% упаковки</small>
-                </td>
-                <td>
-                  {inventory
-                    ? m.checkedAt
-                      ? date(m.checkedAt)
-                      : "Не сверяли"
-                    : money(m.packageCost / m.packageQty)}
-                </td>
-                <td>
-                  <div className="actions">
-                    {inventory ? (
-                      <button onClick={() => open(m, "inventory")}>
-                        Сверить
-                      </button>
+                    <div className="material-mobile">
+                      <dl className="material-mobile-stats">
+                        <div>
+                          <dt>На складе</dt>
+                          <dd>
+                            {qty(v.physical)} {units[m.unit]}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Резерв</dt>
+                          <dd>
+                            {qty(v.reserved)} {units[m.unit]}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Доступно</dt>
+                          <dd>
+                            <strong>
+                              {qty(v.available)} {units[m.unit]}
+                            </strong>
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Порог</dt>
+                          <dd>
+                            {qty(m.minimum)} {units[m.unit]}
+                          </dd>
+                        </div>
+                      </dl>
+                      <details>
+                        <summary>Статус, цена и действия</summary>
+                        <div className="material-mobile-extra">
+                          <div>
+                            <span>Статус</span>
+                            <Badge
+                              tone={
+                                v.level === "critical"
+                                  ? "danger"
+                                  : v.level === "warning"
+                                    ? "warning"
+                                    : "success"
+                              }
+                            >
+                              {v.available < 0
+                                ? "Дефицит резерва"
+                                : v.level === "critical"
+                                  ? "Пополнить"
+                                  : v.level === "warning"
+                                    ? "Скоро закончится"
+                                    : "В норме"}
+                            </Badge>
+                          </div>
+                          <div>
+                            <span>
+                              {inventory ? "Последняя сверка" : "Цена / ед."}
+                            </span>
+                            <strong>
+                              {inventory
+                                ? m.checkedAt
+                                  ? date(m.checkedAt)
+                                  : "Не сверяли"
+                                : money(m.packageCost / m.packageQty)}
+                            </strong>
+                          </div>
+                          {m.colorEnabled !== false && m.color && (
+                            <div>
+                              <span>Цвет</span>
+                              <span>{m.color}</span>
+                            </div>
+                          )}
+                          {materialActions(m)}
+                        </div>
+                      </details>
+                    </div>
+                  </td>
+                  <td className="material-color">
+                    {m.colorEnabled !== false && m.color ? (
+                      <span
+                        className="swatch"
+                        style={{ background: m.color }}
+                        title={m.color}
+                      />
                     ) : (
-                      <>
-                        <button
-                          className="icon"
-                          title="Пополнить"
-                          aria-label={"Пополнить " + m.name}
-                          onClick={() => open(m, "receipt")}
-                        >
-                          <PackagePlus size={17} />
-                        </button>
-                        <button
-                          className="icon"
-                          title="Редактировать"
-                          aria-label={"Редактировать " + m.name}
-                          onClick={() => setEdit(structuredClone(m))}
-                        >
-                          <Pencil size={17} />
-                        </button>
-                      </>
+                      <span className="muted">—</span>
                     )}
-                    <button
-                      className="icon"
-                      title="История"
-                      aria-label={"История " + m.name}
-                      onClick={() => open(m, "history")}
-                    >
-                      <History size={17} />
-                    </button>
-                    <button
-                      className="icon"
-                      title={m.archived ? "Вернуть из архива" : "Архивировать"}
-                      aria-label={"Архив " + m.name}
-                      onClick={() =>
-                        confirm(
-                          m.archived ? "Вернуть материал?" : "В архив?",
-                          "История и рецепты сохранятся. Архивный материал недоступен для новых запусков.",
-                          () =>
-                            mutate((d) => {
-                              if (stock(d, m.id).reserved > 0)
-                                throw new Error(
-                                  "Сначала завершите активные производства",
-                                );
-                              d.materials.find((x) => x.id === m.id)!.archived =
-                                !m.archived;
-                            }),
-                        )
+                  </td>
+                  <td>
+                    {qty(v.physical)} {units[m.unit]}
+                    {m.unit === "ml" && <small>примерно</small>}
+                  </td>
+                  <td>{qty(v.reserved)}</td>
+                  <td>
+                    <strong>{qty(v.available)}</strong>
+                  </td>
+                  <td>{qty(m.minimum)}</td>
+                  <td>
+                    <Badge
+                      tone={
+                        v.level === "critical"
+                          ? "danger"
+                          : v.level === "warning"
+                            ? "warning"
+                            : "success"
                       }
                     >
-                      <Archive size={17} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </PagedTable>
+                      {v.available < 0
+                        ? "Дефицит резерва"
+                        : v.level === "critical"
+                          ? "Пополнить"
+                          : v.level === "warning"
+                            ? "Скоро закончится"
+                            : "В норме"}
+                    </Badge>
+                    <div
+                      className={"stock-meter " + v.level}
+                      role="meter"
+                      aria-label="Доступный запас относительно упаковки"
+                      aria-valuenow={Math.min(100, v.percent)}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuetext={Math.round(v.percent) + "% упаковки"}
+                    >
+                      <i style={{ width: Math.min(100, v.percent) + "%" }} />
+                    </div>
+                    <small>{Math.round(v.percent)}% упаковки</small>
+                  </td>
+                  <td>
+                    {inventory
+                      ? m.checkedAt
+                        ? date(m.checkedAt)
+                        : "Не сверяли"
+                      : money(m.packageCost / m.packageQty)}
+                  </td>
+                  <td>{materialActions(m)}</td>
+                </tr>
+              );
+            })}
+          </PagedTable>
+        </div>
       )}
       {picker && (
         <CatalogPicker

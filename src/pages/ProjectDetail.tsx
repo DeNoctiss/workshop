@@ -22,7 +22,7 @@ import {
   date,
   Empty,
 } from "../components/ui";
-import { units, stages } from "../domain/model";
+import { closed, units, stages } from "../domain/model";
 import {
   plan,
   stock,
@@ -67,7 +67,20 @@ export function ProjectDetail({
     error = (e as Error).message;
   }
   const status = readiness(s, p),
-    image = assets.find((a) => a.projectId === id && a.cover);
+    image = assets.find((a) => a.projectId === id && a.cover),
+    activeRuns = s.runs
+      .filter((r) => r.projectId === id && !closed(r))
+      .slice()
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const activeRunLinks = activeRuns.map((r) => (
+    <a className="history-row" key={r.id} href={"#/runs/" + r.id}>
+      <span>
+        {date(r.createdAt)} · {r.count} шт.
+      </span>
+      <Badge>{stages[r.stage]}</Badge>
+      <strong>Открыть производство</strong>
+    </a>
+  ));
   return (
     <>
       <Back />
@@ -121,6 +134,26 @@ export function ProjectDetail({
           </span>
         ))}
       </div>
+      {!calculator && activeRuns.length > 0 && (
+        <section
+          className="panel project-active-runs"
+          aria-labelledby="active-runs-title"
+        >
+          <div className="section-head">
+            <h2 id="active-runs-title">Активные производства</h2>
+            <Badge tone="blue">{activeRuns.length}</Badge>
+          </div>
+          <p className="muted">
+            Открыть текущую работу или запланировать отдельный новый запуск
+            ниже.
+          </p>
+          {activeRuns.length > 10 ? (
+            <Paged>{activeRunLinks}</Paged>
+          ) : (
+            <div>{activeRunLinks}</div>
+          )}
+        </section>
+      )}
       <div className="launch-grid">
         <section className="panel launch">
           <div className="section-head">
