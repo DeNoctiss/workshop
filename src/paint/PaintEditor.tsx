@@ -6,6 +6,7 @@ import {
   type PointerEvent as PointerEvt,
   type KeyboardEvent as KeyEvt,
 } from "react";
+import { createPortal } from "react-dom";
 import {
   WandSparkles,
   Lasso,
@@ -21,6 +22,8 @@ import {
   ScanLine,
   PanelRightClose,
   PanelRightOpen,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import { Modal, Photo } from "../components/ui";
 import { Paged } from "../components/Paged";
@@ -35,21 +38,26 @@ import {
   loadMask,
   paintComposite,
   maskCanvas,
+  updateMaskCanvasRegion,
   polygonMask,
   downloadPng,
   png,
+  type PaintCacheEntry,
 } from "./canvas";
 import { normalizeHex } from "./core/color";
 import { PaintSession, type PaintFrame } from "./core/PaintSession";
 import {
   combine,
+  combineStrokeRegion,
   hasSelection,
   imagePoint,
+  likelyBackgroundSelection,
   outlineMask,
-  paintStroke,
+  paintStrokeRegion,
   strokeCoverage,
   type Point,
   type SelectionMode,
+  type WandOptions,
 } from "./core/selection";
 import { PaintPanels, PaintRange, ToolButton } from "./PaintPanels";
 import { usePaintSave, type PaintData } from "./usePaintSave";
@@ -68,6 +76,7 @@ type Operation = {
   original: PaintFrame;
   point?: Point;
   mode: SelectionMode;
+  options?: WandOptions;
 };
 type Stroke = {
   original: PaintFrame;
@@ -76,6 +85,9 @@ type Stroke = {
   mode: SelectionMode;
   tool: Tool;
   points: Point[];
+  selectionMask?: Uint8Array;
+  paintMask?: Uint8Array;
+  selectionConstraint?: Uint8Array | null;
   pan?: { x: number; y: number; left: number; top: number };
 };
 const MODES: Record<SelectionMode, string> = {
@@ -87,11 +99,13 @@ const MODES: Record<SelectionMode, string> = {
 export function PaintEditor({
   projectId,
   initial,
+  inlineHostId,
   onClose,
   onSave,
 }: {
   projectId: string;
   initial?: PaintData;
+  inlineHostId?: string;
   onClose: () => void;
   onSave: (data: PaintData, assets: Asset[]) => Promise<boolean>;
 }) {
@@ -101,17 +115,28 @@ export function PaintEditor({
     ),
     [sourceFile, setSourceFile] = useState<Asset | null>(null),
     [title, setTitle] = useState(initial?.title ?? "Вариант окраски");
+  const [expanded, setExpanded] = useState(
+    !inlineHostId || window.matchMedia("(max-width: 760px)").matches,
+  );
+  const [inlineHost, setInlineHost] = useState<HTMLElement | null>(null);
+  const canInline =
+    !!inlineHost && !window.matchMedia("(max-width: 760px)").matches;
   const originalInitial = useRef(initial),
     documentId = useRef(initial?.document.id ?? uid());
   const [tick, setTick] = useState(0),
     [ready, setReady] = useState(false),
     [loading, setLoading] = useState(false),
+    [workerReady, setWorkerReady] = useState(false),
+    [saving, setSaving] = useState(false),
     [error, setError] = useState("");
   const [tool, setTool] = useState<Tool>("wand"),
     [mode, setMode] = useState<SelectionMode>("replace");
   const [tolerance, setTolerance] = useState(12),
-    [contiguous, setContiguous] = useState(true),
-    [diagonal, setDiagonal] = useState(false);
+    [limitedTolerance, setLimitedTolerance] = useState<number | null>(null),
+    [seedOnly, setSeedOnly] = useState(false),
+    [edgeSoftness, setEdgeSoftness] = useState(2),
+    [selectionRisk, setSelectionRisk] = useState<number | null>(null),
+    [riskAccepted, setRiskAccepted] = useState(false);
   const [diameter, setDiameter] = useState(36),
     [hardness, setHardness] = useState(100),
     [brushOpacity, setBrushOpacity] = useState(100);
@@ -125,7 +150,9 @@ export function PaintEditor({
     [overlayAlpha, setOverlayAlpha] = useState(35);
   const [before, setBefore] = useState(false),
     [zoom, setZoom] = useState(1),
-    [sidebar, setSidebar] = useState(true),
+    [sidebar, setSidebar] = useState(
+      !window.matchMedia("(max-width: 760px)").matches,
+    ),
     [space, setSpace] = useState(false);
   const [color, setColor] = useState("#d49a76"),
     [material, setMaterial] = useState<MaterialReference>(),
@@ -138,22 +165,113 @@ export function PaintEditor({
   const base = useRef<HTMLCanvasElement | null>(null),
     session = useRef<PaintSession | null>(null),
     worker = useRef<Worker | null>(null),
+    workerPending = useRef(false),
+    restartWorker = useRef<() => void>(() => {}),
+    operationTimer = useRef<number | null>(null),
     request = useRef(0),
     operation = useRef<Operation | null>(null),
     stroke = useRef<Stroke | null>(null);
   const polygon = useRef<Point[]>([]),
     hover = useRef<Point | null>(null),
     polygonMode = useRef<SelectionMode>("replace"),
-    cache = useRef(new Map()),
+    cache = useRef(new Map<string, PaintCacheEntry>()),
+    overlayCache = useRef<{
+      mask: Uint8Array;
+      mode: "contour" | "mask";
+      canvas: HTMLCanvasElement;
+    } | null>(null),
     autoFit = useRef(true),
     spaceRef = useRef(false),
+    strokeRefreshFrame = useRef(0),
     drawFrame = useRef(0);
   const zoomAnchor = useRef<{ screen: Point; image: Point } | null>(null);
+  const allowRoute = useRef(false);
+  useLayoutEffect(() => {
+    if (!inlineHostId) return;
+    const host = document.getElementById(inlineHostId);
+    setInlineHost(host);
+    if (!host) setExpanded(true);
+  }, [inlineHostId]);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 760px)");
+    const narrow = () => {
+      if (media.matches) {
+        setExpanded(true);
+        setSidebar(false);
+      }
+    };
+    media.addEventListener("change", narrow);
+    return () => media.removeEventListener("change", narrow);
+  }, []);
+  useEffect(() => {
+    const backup = (e: Event) => {
+      e.preventDefault();
+      setError("Сохраните и закройте редактор перед выгрузкой ZIP.");
+    };
+    window.addEventListener("workshop-before-backup", backup);
+    return () => window.removeEventListener("workshop-before-backup", backup);
+  }, []);
+  useEffect(() => {
+    const guard = (event: Event) => {
+      if (allowRoute.current) return;
+      const engine = session.current;
+      if (
+        (!engine && !sourceId) ||
+        (engine &&
+          !engine.revision &&
+          !engine.transaction &&
+          !engine.frame.editing &&
+          !hasSelection(engine.frame.selection) &&
+          (originalInitial.current || !sourceId))
+      )
+        return;
+      event.preventDefault();
+      if (saving) {
+        setError("Дождитесь окончания сохранения перед переходом.");
+        return;
+      }
+      const destination = location.hash;
+      confirm(
+        "Уйти из редактора?",
+        "Несохранённые слои и временное выделение будут потеряны.",
+        async () => {
+          allowRoute.current = true;
+          location.hash = destination;
+        },
+      );
+    };
+    window.addEventListener("workshop-before-route", guard);
+    return () => window.removeEventListener("workshop-before-route", guard);
+  }, [sourceId, saving, confirm]);
   const refresh = () => setTick((n) => n + 1);
+  const refreshStroke = () => {
+    if (strokeRefreshFrame.current) return;
+    strokeRefreshFrame.current = requestAnimationFrame(() => {
+      strokeRefreshFrame.current = 0;
+      refresh();
+    });
+  };
+  useEffect(() => () => cancelAnimationFrame(strokeRefreshFrame.current), []);
   const s = session.current,
     f = s?.frame,
     active = s?.active;
-  const { status, save } = usePaintSave({
+  const modeTool = tool === "wand" || tool === "lasso" || tool === "polygon";
+  const limitShort =
+    limitedTolerance === null
+      ? ""
+      : seedOnly
+        ? " · цвет как у фона"
+        : ` · ΔE ${limitedTolerance}/${tolerance}`;
+  const limitExplanation =
+    limitedTolerance === null
+      ? undefined
+      : seedOnly
+        ? "Цвет точки совпадает с фоном: оставлен один пиксель. Попробуйте другую точку или уточните область лассо."
+        : `Область дошла до края кадра. Чтобы не захватить фон, применён допуск ΔE ${limitedTolerance} вместо ${tolerance}.`;
+  const selectionAvailable = hasSelection(f?.selection ?? null);
+  const { status, save, reuseMask, reusePreview } = usePaintSave({
+    autoSave: false,
+    initialSaved: !!initial,
     session: s,
     base: base.current,
     projectId,
@@ -167,7 +285,13 @@ export function PaintEditor({
   const fail = (e: unknown) =>
     setError(e instanceof Error ? e.message : String(e));
   const invalidate = () => {
+    if (operationTimer.current !== null) {
+      window.clearTimeout(operationTimer.current);
+      operationTimer.current = null;
+    }
     request.current++;
+    if (workerPending.current) restartWorker.current();
+    workerPending.current = false;
     setProcessing(false);
   };
   const finishOperation = () => {
@@ -177,26 +301,42 @@ export function PaintEditor({
     session.current?.commit();
   };
   const cancelOperation = () => {
+    const wasWand = operation.current?.kind === "wand";
     invalidate();
     operation.current = null;
     session.current?.cancel();
+    if (wasWand) {
+      setSelectionRisk(null);
+      setLimitedTolerance(null);
+      setSeedOnly(false);
+    }
     setRefining(false);
     refresh();
   };
   const cancelGesture = () => {
+    cancelAnimationFrame(strokeRefreshFrame.current);
+    strokeRefreshFrame.current = 0;
     if (stroke.current) {
       session.current?.cancel();
       stroke.current = null;
     }
     polygon.current = [];
     hover.current = null;
+    setError("");
     refresh();
   };
   const action = (fn: () => void) => {
+    if (saving) return;
     try {
       cancelGesture();
       finishOperation();
+      setLimitedTolerance(null);
+      setSeedOnly(false);
+      const previousSelection = session.current?.frame.selection;
       fn();
+      if (session.current?.frame.selection !== previousSelection) {
+        setSelectionRisk(null);
+      }
       setError("");
       refresh();
     } catch (e) {
@@ -229,17 +369,48 @@ export function PaintEditor({
       w,
       h,
     );
-  const runWand = (options = { tolerance, contiguous, diagonal }) => {
+  const runWand = (options: Partial<WandOptions> = {}) => {
     const op = operation.current;
     if (!op || op.kind !== "wand") return;
+    const configured: WandOptions = {
+      tolerance: options.tolerance ?? tolerance,
+      contiguous: true,
+      diagonal: false,
+      protectFrame: op.mode === "replace" || op.mode === "add",
+      edgeSoftness: options.edgeSoftness ?? edgeSoftness,
+      sampleRadius: 1,
+    };
+    op.options = configured;
+    setLimitedTolerance(null);
+    setSeedOnly(false);
     const id = ++request.current;
+    workerPending.current = true;
     setProcessing(true);
-    worker.current?.postMessage({ type: "fill", id, point: op.point, options });
+    worker.current?.postMessage({
+      type: "fill",
+      id,
+      point: op.point,
+      options: configured,
+    });
+  };
+  const recalcWand = (
+    options: Partial<WandOptions> & { bounded?: boolean },
+  ) => {
+    if (operation.current?.kind !== "wand") return;
+    if (operationTimer.current !== null)
+      window.clearTimeout(operationTimer.current);
+    request.current++;
+    setProcessing(true);
+    operationTimer.current = window.setTimeout(() => {
+      operationTimer.current = null;
+      runWand(options);
+    }, 90);
   };
   const runRefine = (g: number, blur: number) => {
     const op = operation.current;
     if (!op || op.kind !== "refine" || !op.original.selection) return;
     const id = ++request.current;
+    workerPending.current = true;
     setProcessing(true);
     worker.current?.postMessage({
       type: "refine",
@@ -248,6 +419,17 @@ export function PaintEditor({
       grow: g,
       feather: blur,
     });
+  };
+  const recalcRefine = (g: number, blur: number) => {
+    if (operation.current?.kind !== "refine") return;
+    if (operationTimer.current !== null)
+      window.clearTimeout(operationTimer.current);
+    request.current++;
+    setProcessing(true);
+    operationTimer.current = window.setTimeout(() => {
+      operationTimer.current = null;
+      runRefine(g, blur);
+    }, 90);
   };
   const fit = () => {
     if (!stage.current || !base.current) return;
@@ -316,55 +498,89 @@ export function PaintEditor({
               const a = await db.assets.get(l.maskAssetId);
               if (!a) throw Error("Не найдена маска «" + l.name + "»");
               const { maskAssetId: _id, ...rest } = l;
-              return { ...rest, mask: await loadMask(a.blob, width, height) };
+              const mask = await loadMask(a.blob, width, height);
+              reuseMask(mask, a);
+              return { ...rest, mask };
             }),
           )
         : [];
+      const previewAsset = init?.document.previewAssetId
+        ? await db.assets.get(init.document.previewAssetId)
+        : undefined;
       if (cancelled) return;
       base.current = original;
       session.current = new PaintSession(width, height, layers);
-      const work = new Worker(
-        new URL("./selection.worker.ts", import.meta.url),
-        { type: "module" },
-      );
-      worker.current = work;
-      work.onmessage = (e) => {
-        if (cancelled || e.data.id !== request.current) return;
-        setProcessing(false);
-        const op = operation.current,
-          engine = session.current;
-        if (!op || !engine) return;
-        if (e.data.error) {
-          fail(e.data.error);
-          engine.cancel();
-          operation.current = null;
-          setRefining(false);
-          refresh();
-          return;
-        }
-        const selection =
-          op.kind === "wand"
-            ? combine(op.original.selection, e.data.mask, op.mode)
-            : e.data.mask;
-        engine.preview({ ...op.original, selection });
-        refresh();
-      };
-      work.onerror = (e) => {
-        if (!cancelled) {
+      if (previewAsset) reusePreview(layers, previewAsset);
+      const startWorker = () => {
+        setWorkerReady(false);
+        const work = new Worker(
+          new URL("./selection.worker.ts", import.meta.url),
+          { type: "module" },
+        );
+        worker.current = work;
+        work.onmessage = (e) => {
+          if (cancelled || work !== worker.current) return;
+          if (e.data.type === "ready") {
+            setWorkerReady(true);
+            return;
+          }
+          if (e.data.id !== request.current) return;
+          workerPending.current = false;
           setProcessing(false);
-          fail(e.message || "Ошибка выделения");
-          session.current?.cancel();
-          operation.current = null;
-          setRefining(false);
+          const op = operation.current,
+            engine = session.current;
+          if (!op || !engine) return;
+          if (e.data.error) {
+            fail(e.data.error);
+            engine.cancel();
+            operation.current = null;
+            setRefining(false);
+            refresh();
+            return;
+          }
+          const selection =
+            op.kind === "wand"
+              ? combine(op.original.selection, e.data.mask, op.mode)
+              : e.data.mask;
+          if (op.kind === "wand") {
+            setLimitedTolerance(
+              e.data.limited ? e.data.effectiveTolerance : null,
+            );
+            setSeedOnly(!!e.data.seedOnly);
+            const risk =
+              op.options?.contiguous && op.point
+                ? likelyBackgroundSelection(selection, width, height, op.point)
+                : null;
+            setSelectionRisk(risk?.fraction ?? null);
+            setRiskAccepted(false);
+          }
+          engine.preview({ ...op.original, selection });
           refresh();
-        }
+        };
+        work.onerror = (e) => {
+          if (!cancelled && work === worker.current) {
+            workerPending.current = false;
+            setWorkerReady(false);
+            setProcessing(false);
+            fail(e.message || "Ошибка выделения");
+            session.current?.cancel();
+            operation.current = null;
+            setRefining(false);
+            refresh();
+          }
+        };
+        const pixels = original
+          .getContext("2d")!
+          .getImageData(0, 0, width, height).data;
+        work.postMessage({ type: "init", pixels, width, height }, [
+          pixels.buffer,
+        ]);
       };
-      const pixels = original
-        .getContext("2d")!
-        .getImageData(0, 0, width, height).data;
-      work.postMessage({ type: "init", pixels, width, height }, [
-        pixels.buffer,
-      ]);
+      restartWorker.current = () => {
+        worker.current?.terminate();
+        startWorker();
+      };
+      startWorker();
       setReady(true);
       setLoading(false);
       refresh();
@@ -376,11 +592,15 @@ export function PaintEditor({
     });
     return () => {
       cancelled = true;
+      if (operationTimer.current !== null)
+        window.clearTimeout(operationTimer.current);
       request.current++;
       worker.current?.terminate();
       worker.current = null;
+      workerPending.current = false;
+      restartWorker.current = () => {};
     };
-  }, [sourceId, sourceFile]);
+  }, [sourceId, sourceFile, reuseMask, reusePreview]);
   useEffect(() => {
     if (!ready) return;
     requestAnimationFrame(() => {
@@ -394,7 +614,7 @@ export function PaintEditor({
     });
     resize.observe(el);
     return () => resize.disconnect();
-  }, [ready]);
+  }, [ready, expanded]);
   useEffect(() => {
     const stop = () => {
       spaceRef.current = false;
@@ -463,20 +683,32 @@ export function PaintEditor({
       if (before) return;
       const mask = engine.frame.selection;
       if (mask && overlay !== "none") {
-        if (overlay === "mask") {
-          ctx.globalAlpha = overlayAlpha / 100;
-          ctx.drawImage(maskCanvas(mask, w, h, "#20bcea"), 0, 0);
-          ctx.globalAlpha = 1;
-        } else {
-          const edge = outlineMask(mask, w, h),
-            im = ctx.createImageData(w, h);
-          for (let i = 0; i < edge.length; i++)
-            if (edge[i]) {
-              const c = (Math.floor(i / w) + (i % w)) % 8 < 4 ? 255 : 15;
-              im.data.set([c, c, c, 255], i * 4);
-            }
-          ctx.putImageData(im, 0, 0);
+        let cached = overlayCache.current;
+        if (!cached || cached.mask !== mask || cached.mode !== overlay) {
+          const overlayCanvas =
+            overlay === "mask"
+              ? maskCanvas(mask, w, h, "#20bcea")
+              : canvas(w, h);
+          if (overlay === "contour") {
+            const edge = outlineMask(mask, w, h),
+              overlayContext = overlayCanvas.getContext("2d")!,
+              im = overlayContext.createImageData(w, h);
+            for (let i = 0; i < edge.length; i++)
+              if (edge[i]) {
+                const bright = (Math.floor(i / w) + (i % w)) % 8 < 4;
+                im.data.set(
+                  bright ? [0, 210, 245, 255] : [10, 48, 75, 255],
+                  i * 4,
+                );
+              }
+            overlayContext.putImageData(im, 0, 0);
+          }
+          cached = { mask, mode: overlay, canvas: overlayCanvas };
+          overlayCache.current = cached;
         }
+        ctx.globalAlpha = overlay === "mask" ? overlayAlpha / 100 : 1;
+        ctx.drawImage(cached.canvas, 0, 0);
+        ctx.globalAlpha = 1;
       }
       const points =
         stroke.current?.tool === "lasso"
@@ -504,15 +736,19 @@ export function PaintEditor({
       }
     });
     return () => cancelAnimationFrame(drawFrame.current);
-  }, [tick, ready, before, overlay, overlayAlpha, zoom, w, h]);
+  }, [tick, ready, before, overlay, overlayAlpha, zoom, w, h, expanded]);
   const completePolygon = () => {
-    if (!s || new Set(polygon.current.map((p) => p.x + ":" + p.y)).size < 3)
+    if (!s) return;
+    if (new Set(polygon.current.map((p) => p.x + ":" + p.y)).size < 3) {
+      setError("Для полигона нужны минимум три разные точки.");
       return;
+    }
     const mask = polygonMask(polygon.current, w, h);
     s.change({
       ...s.frame,
       selection: combine(s.frame.selection, mask, polygonMode.current),
     });
+    setSelectionRisk(null);
     polygon.current = [];
     hover.current = null;
     refresh();
@@ -524,42 +760,74 @@ export function PaintEditor({
     if (st.tool === "lasso") {
       st.points.push(p);
       st.last = p;
-      refresh();
+      refreshStroke();
       return;
     }
-    strokeCoverage(st.coverage, w, h, st.last, p, diameter, hardness / 100);
+    const rect = strokeCoverage(
+      st.coverage,
+      w,
+      h,
+      st.last,
+      p,
+      diameter,
+      hardness / 100,
+    );
     st.last = p;
     if (st.tool === "select-brush" || st.tool === "select-erase") {
+      st.selectionMask ??=
+        st.mode === "add" || st.mode === "subtract"
+          ? (st.original.selection?.slice() ?? new Uint8Array(w * h))
+          : new Uint8Array(w * h);
+      combineStrokeRegion(
+        st.original.selection,
+        st.coverage,
+        st.selectionMask,
+        st.mode,
+        w,
+        rect,
+      );
+      overlayCache.current = null;
       engine.preview({
         ...st.original,
-        selection: combine(st.original.selection, st.coverage, st.mode),
+        selection: st.selectionMask,
       });
     } else {
       const layer = st.original.layers.find((l) => l.id === st.original.active);
-      if (layer)
+      if (layer) {
+        st.paintMask ??= layer.mask.slice();
+        paintStrokeRegion(
+          layer.mask,
+          st.paintMask,
+          st.coverage,
+          brushOpacity / 100,
+          st.tool === "erase",
+          st.selectionConstraint ?? null,
+          w,
+          rect,
+        );
+        const cached = cache.current.get(layer.id);
+        if (cached?.mask === st.paintMask && cached.color === layer.color)
+          updateMaskCanvasRegion(
+            cached.canvas,
+            st.paintMask,
+            w,
+            rect,
+            layer.color,
+          );
         engine.preview({
           ...st.original,
           layers: st.original.layers.map((l) =>
-            l.id === layer.id
-              ? {
-                  ...l,
-                  mask: paintStroke(
-                    layer.mask,
-                    st.coverage,
-                    brushOpacity / 100,
-                    st.tool === "erase",
-                    st.original.selection,
-                  ),
-                }
-              : l,
+            l.id === layer.id ? { ...l, mask: st.paintMask! } : l,
           ),
         });
+      }
     }
-    refresh();
+    refreshStroke();
   };
   const down = (e: PointerEvt<HTMLElement>) => {
     e.stopPropagation();
-    if (!s || before || e.button !== 0) return;
+    if (!s || saving || before || e.button !== 0) return;
+    e.preventDefault();
     root.current?.focus();
     setError("");
     const p = point(e);
@@ -606,12 +874,17 @@ export function PaintEditor({
     }
     finishOperation();
     if (tool === "wand") {
+      const selectedMode = effectiveMode(e);
+      if (selectedMode === "intersect" && !hasSelection(s.frame.selection)) {
+        setError("Сначала обведите область лассо, затем выберите «Пересечь».");
+        return;
+      }
       s.begin();
       operation.current = {
         kind: "wand",
         original: s.frame,
         point: p,
-        mode: effectiveMode(e),
+        mode: selectedMode,
       };
       runWand();
       return;
@@ -627,14 +900,28 @@ export function PaintEditor({
       );
       return;
     }
+    if (tool === "select-erase" && !hasSelection(s.frame.selection)) {
+      setError("Сначала создайте выделение, затем уберите лишнее кистью.");
+      return;
+    }
     s.begin();
     stroke.current = {
       original: s.frame,
       coverage: new Uint8Array(w * h),
       last: p,
       points: [p],
-      mode: effectiveMode(e),
+      mode:
+        tool === "select-brush"
+          ? "add"
+          : tool === "select-erase"
+            ? "subtract"
+            : effectiveMode(e),
       tool,
+      selectionConstraint:
+        (tool === "brush" || tool === "erase") &&
+        hasSelection(s.frame.selection)
+          ? s.frame.selection
+          : null,
     };
     e.currentTarget.setPointerCapture(e.pointerId);
     updateStroke(p);
@@ -686,13 +973,23 @@ export function PaintEditor({
         else s.cancel();
       }
       s.commit();
+      if (
+        st.tool === "lasso" ||
+        st.tool === "select-brush" ||
+        st.tool === "select-erase"
+      ) {
+        setSelectionRisk(null);
+      }
     }
     stroke.current = null;
     if (e.currentTarget.hasPointerCapture(e.pointerId))
       e.currentTarget.releasePointerCapture(e.pointerId);
+    cancelAnimationFrame(strokeRefreshFrame.current);
+    strokeRefreshFrame.current = 0;
     refresh();
   };
   const chooseColor = (value: string, ref?: MaterialReference) => {
+    if (saving) return;
     const hex = normalizeHex(value);
     if (!hex) {
       setError(
@@ -706,41 +1003,103 @@ export function PaintEditor({
       if (s?.active) s.patch(s.active.id, { color: hex, material: ref });
     });
   };
-  const close = () => {
-    if (stroke.current || polygon.current.length) {
-      cancelGesture();
+  const previewColor = (value: string) => {
+    if (saving) return;
+    const hex = normalizeHex(value);
+    if (!hex) return;
+    if (operation.current) finishOperation();
+    setColor(hex);
+    setMaterial(undefined);
+    if (s?.active)
+      s.patch(s.active.id, { color: hex, material: undefined }, true);
+    refresh();
+  };
+  const commitColor = () => {
+    s?.commit();
+    refresh();
+  };
+  const saveAndClose = () => {
+    if (!ready || loading || saving || processing || refining || stroke.current)
       return;
-    }
-    if (operation.current?.kind === "refine") {
-      cancelOperation();
+    if (polygon.current.length) {
+      setError(
+        "Завершите или отмените полигональное выделение перед сохранением.",
+      );
       return;
     }
     finishOperation();
     const done = async () => {
-      if (await save()) onClose();
+      setSaving(true);
+      try {
+        if (await save()) onClose();
+      } finally {
+        setSaving(false);
+      }
     };
-    if (
-      session.current?.frame.editing ||
-      hasSelection(session.current?.frame.selection ?? null)
-    ) {
+    if (s?.frame.editing || hasSelection(s?.frame.selection ?? null))
       confirm(
-        "Закрыть редактор?",
-        "Нанесённые слои сохранятся. Текущее выделение ещё не применено и будет сброшено.",
+        "Сохранить и закрыть?",
+        "Слои сохранятся. Временное выделение и история отмены исчезнут после закрытия.",
         async () => {
           await done();
         },
       );
-    } else void done();
+    else void done();
+  };
+  const cancel = () => {
+    if (loading || processing || saving) return;
+    if (
+      (!initial && sourceId) ||
+      s?.revision ||
+      s?.transaction ||
+      s?.frame.editing ||
+      hasSelection(s?.frame.selection ?? null) ||
+      polygon.current.length
+    )
+      confirm(
+        "Отменить изменения?",
+        "Несохранённые слои и временное выделение будут потеряны. Исходное фото останется без изменений.",
+        async () => {
+          onClose();
+        },
+      );
+    else onClose();
+  };
+  const dismiss = () => {
+    if (saving) return;
+    if (expanded && canInline) setExpanded(false);
+    else cancel();
   };
   const keys = (e: KeyEvt) => {
     e.stopPropagation();
-    const input = (e.target as HTMLElement).closest(
-      'input,textarea,select,[contenteditable="true"]',
-    );
-    if (input && e.key !== "Escape") return;
+    if (saving) {
+      e.preventDefault();
+      return;
+    }
     const key = /^Key[A-Z]$/.test(e.code)
       ? e.code.slice(3).toLowerCase()
       : e.key.toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && key === "d") {
+      e.preventDefault();
+      if (!s || !hasSelection(s.frame.selection)) return;
+      action(() =>
+        s.change({
+          ...s.frame,
+          selection: s.frame.editing ? new Uint8Array(w * h) : null,
+        }),
+      );
+      return;
+    }
+    const target = e.target as HTMLElement;
+    const input = target.closest(
+      'input,textarea,select,[contenteditable="true"]',
+    );
+    if (input && e.key !== "Escape") return;
+    if (
+      target.closest('button,[role="button"]') &&
+      (e.key === " " || e.key === "Enter")
+    )
+      return;
     if ((e.ctrlKey || e.metaKey) && key === "z") {
       e.preventDefault();
       action(() => s?.undo(e.shiftKey));
@@ -749,16 +1108,6 @@ export function PaintEditor({
     if ((e.ctrlKey || e.metaKey) && key === "y") {
       e.preventDefault();
       action(() => s?.undo(true));
-      return;
-    }
-    if ((e.ctrlKey || e.metaKey) && key === "d") {
-      e.preventDefault();
-      action(() =>
-        s?.change({
-          ...s.frame,
-          selection: s.frame.editing ? new Uint8Array(w * h) : null,
-        }),
-      );
       return;
     }
     if (!e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -818,7 +1167,7 @@ export function PaintEditor({
         cancelOperation();
       } else if (s?.frame.editing) {
         action(() => s.cancelArea());
-      } else close();
+      } else dismiss();
     }
   };
   const tools: [Tool, string, React.ReactNode][] = [
@@ -831,62 +1180,339 @@ export function PaintEditor({
     ["erase", "Ластик слоя · E", <Eraser />],
     ["pan", "Перемещение · Пробел", <Hand />],
   ];
-  return (
-    <Modal title="Виртуальная покраска" wide onClose={close}>
+  const imageStage = (
+    <div className="pe-stage" ref={stage}>
       <div
-        className="pe-v2"
+        className="pe-plane"
+        style={{ minWidth: w * zoom + 48, minHeight: h * zoom + 48 }}
+      >
+        <div
+          className="pe-image"
+          style={{
+            width: w * zoom,
+            height: h * zoom,
+            cursor:
+              space || tool === "pan"
+                ? "grab"
+                : ["brush", "erase", "select-brush", "select-erase"].includes(
+                      tool,
+                    )
+                  ? "none"
+                  : "crosshair",
+          }}
+        >
+          <canvas
+            ref={main}
+            width={w}
+            height={h}
+            aria-label="Изображение для выделения и перекраски"
+            onPointerDown={down}
+            onPointerMove={move}
+            onPointerUp={up}
+            onPointerCancel={cancelGesture}
+            onPointerLeave={() => {
+              if (cursor.current) cursor.current.style.display = "none";
+            }}
+            onDoubleClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (tool === "polygon") completePolygon();
+            }}
+          />
+          <canvas className="pe-overlay" ref={maskView} width={w} height={h} />
+          <div className="pe-cursor" ref={cursor} />
+        </div>
+      </div>
+    </div>
+  );
+  const content = (
+    <>
+      <div
+        className={
+          "pe-v2 nodrag nopan nowheel" + (expanded ? "" : " pe-inline-editor")
+        }
         ref={root}
         tabIndex={-1}
+        aria-busy={saving}
         onKeyDown={keys}
         onPointerDown={(e) => e.stopPropagation()}
+        onDoubleClick={(e) => e.stopPropagation()}
       >
         {!ready ? (
           <div className="pe-chooser">
-            <h3>Выберите исходное изображение</h3>
-            <p>
-              Оригинал сохраняется. Рабочая копия — до 2048 px по длинной
-              стороне.
-            </p>
-            <label className="button">
-              Загрузить фото
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                hidden
-                disabled={loading}
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  e.target.value = "";
-                  if (!file) return;
-                  setLoading(true);
-                  try {
-                    const a = await prepareImage(file, projectId, "process", 0);
-                    setSourceFile(a);
-                    setSourceId(a.id);
-                  } catch (err) {
-                    fail(err);
-                    setLoading(false);
-                  }
-                }}
-              />
-            </label>
-            {loading && <p role="status">Открываем изображение…</p>}
-            <Paged className="pe-photo-grid">
-              {assets
-                .filter((a) => a.projectId === projectId && !a.purpose)
-                .map((a) => (
-                  <button
-                    key={a.id}
+            {initial && loading ? (
+              <p role="status">Открываем сохранённый вариант окраски…</p>
+            ) : (
+              <>
+                <h3>Выберите исходное изображение</h3>
+                <p>
+                  Оригинал сохраняется. Рабочая копия — до 2048 px по длинной
+                  стороне.
+                </p>
+                <label className="button">
+                  Загрузить фото
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    hidden
                     disabled={loading}
-                    aria-label={a.caption || "Фото проекта"}
-                    onClick={() => setSourceId(a.id)}
-                  >
-                    <Photo asset={a} />
-                    <span>{a.caption || "Фото проекта"}</span>
-                  </button>
-                ))}
-            </Paged>
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (!file) return;
+                      setLoading(true);
+                      try {
+                        const a = await prepareImage(
+                          file,
+                          projectId,
+                          "process",
+                          0,
+                        );
+                        setSourceFile(a);
+                        setSourceId(a.id);
+                      } catch (err) {
+                        fail(err);
+                        setLoading(false);
+                      }
+                    }}
+                  />
+                </label>
+                {loading && <p role="status">Открываем изображение…</p>}
+                <Paged className="pe-photo-grid">
+                  {assets
+                    .filter((a) => a.projectId === projectId && !a.purpose)
+                    .map((a) => (
+                      <button
+                        key={a.id}
+                        disabled={loading}
+                        aria-label={a.caption || "Фото проекта"}
+                        onClick={() => setSourceId(a.id)}
+                      >
+                        <Photo asset={a} />
+                        <span>{a.caption || "Фото проекта"}</span>
+                      </button>
+                    ))}
+                </Paged>
+              </>
+            )}
           </div>
+        ) : !expanded ? (
+          <section
+            className="pe-inline-layout"
+            aria-label="Редактор в карточке"
+          >
+            <header className="pe-inline-head">
+              <strong>Перекраска в карточке</strong>
+              <ToolButton
+                label="Развернуть редактор"
+                onClick={() => setExpanded(true)}
+              >
+                <Maximize2 size={17} />
+              </ToolButton>
+            </header>
+            <div className="pe-inline-tools">
+              {tools
+                .filter(([key]) =>
+                  ["wand", "select-brush", "select-erase", "pan"].includes(key),
+                )
+                .map(([key, label, icon]) => (
+                  <ToolButton
+                    key={key}
+                    label={label}
+                    selected={tool === key}
+                    onClick={() => chooseTool(key)}
+                  >
+                    {icon}
+                  </ToolButton>
+                ))}
+              <strong>{tools.find(([key]) => key === tool)?.[1]}</strong>
+            </div>
+            <div className="pe-inline-main">
+              {imageStage}
+              <aside
+                className="pe-inline-side"
+                aria-label="Параметры перекраски"
+              >
+                <div className="pe-inline-options">
+                  {tool === "wand" ? (
+                    <>
+                      <label>
+                        Операция
+                        <select
+                          aria-label="Операция выделения"
+                          value={mode}
+                          onChange={(e) =>
+                            action(() =>
+                              setMode(e.target.value as SelectionMode),
+                            )
+                          }
+                        >
+                          {Object.entries(MODES).map(([value, label]) => (
+                            <option
+                              key={value}
+                              value={value}
+                              disabled={
+                                value === "intersect" && !selectionAvailable
+                              }
+                            >
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <PaintRange
+                        label="Допуск ΔE"
+                        value={tolerance}
+                        max={100}
+                        onChange={(value) => {
+                          setTolerance(value);
+                          recalcWand({ tolerance: value });
+                        }}
+                      />
+                      <PaintRange
+                        label="Мягкий край ΔE"
+                        value={edgeSoftness}
+                        max={10}
+                        onChange={(value) => {
+                          setEdgeSoftness(value);
+                          recalcWand({ edgeSoftness: value });
+                        }}
+                      />
+                    </>
+                  ) : tool === "select-brush" || tool === "select-erase" ? (
+                    <>
+                      <PaintRange
+                        label="Кисть, px"
+                        value={diameter}
+                        min={1}
+                        max={200}
+                        onChange={setDiameter}
+                      />
+                      <PaintRange
+                        label="Жёсткость, %"
+                        value={hardness}
+                        max={100}
+                        onChange={setHardness}
+                      />
+                    </>
+                  ) : (
+                    <span className="pe-hint">
+                      Тяните фото для перемещения.
+                    </span>
+                  )}
+                </div>
+                <div className="pe-inline-selection">
+                  <span role="status" title={limitExplanation}>
+                    {processing
+                      ? "Вычисляем маску…"
+                      : !workerReady && tool === "wand"
+                        ? "Подготавливаем палочку…"
+                        : hasSelection(f?.selection ?? null)
+                          ? "Выделение временное"
+                          : active
+                            ? "Слой готов"
+                            : "Выделите область"}
+                    {limitShort}
+                  </span>
+                  <button
+                    disabled={
+                      processing ||
+                      refining ||
+                      (selectionRisk !== null && !riskAccepted) ||
+                      !hasSelection(f?.selection ?? null)
+                    }
+                    onClick={() =>
+                      action(() =>
+                        s?.addLayer(
+                          active?.color ?? color,
+                          active?.material ?? material,
+                        ),
+                      )
+                    }
+                  >
+                    Слой из выделения
+                  </button>
+                  {processing && (
+                    <button onClick={cancelOperation}>Отменить расчёт</button>
+                  )}
+                </div>
+                <div className="pe-inline-properties">
+                  <label>
+                    Цвет слоя
+                    <input
+                      type="color"
+                      value={active?.color ?? color}
+                      disabled={processing || refining}
+                      onChange={(e) => previewColor(e.target.value)}
+                      onBlur={commitColor}
+                      onPointerUp={commitColor}
+                    />
+                  </label>
+                  {active && (
+                    <PaintRange
+                      label="Непрозрачность слоя, %"
+                      value={Math.round(active.opacity * 100)}
+                      max={100}
+                      onChange={(value) => {
+                        s?.patch(active.id, { opacity: value / 100 }, true);
+                        refresh();
+                      }}
+                      onCommit={() => {
+                        s?.commit();
+                        refresh();
+                      }}
+                    />
+                  )}
+                  <label>
+                    Подсветка
+                    <select
+                      value={overlay}
+                      aria-label="Подсветка выделения"
+                      onChange={(e) =>
+                        setOverlay(e.target.value as typeof overlay)
+                      }
+                    >
+                      <option value="contour">Контур</option>
+                      <option value="mask">Маска</option>
+                      <option value="none">Без подсветки</option>
+                    </select>
+                  </label>
+                </div>
+              </aside>
+            </div>
+            <footer className="pe-inline-actions">
+              <ToolButton
+                label="Отменить · Ctrl Z"
+                disabled={!s?.past.length && !s?.transaction}
+                onClick={() => action(() => s?.undo())}
+              >
+                <Undo2 size={17} />
+              </ToolButton>
+              <ToolButton
+                label="Повторить · Ctrl Shift Z"
+                disabled={!s?.future.length}
+                onClick={() => action(() => s?.undo(true))}
+              >
+                <Redo2 size={17} />
+              </ToolButton>
+              <ToolButton label="Вписать изображение" onClick={fit}>
+                <ScanLine size={17} />
+              </ToolButton>
+              <button
+                className="primary"
+                disabled={loading || processing || refining}
+                onClick={saveAndClose}
+              >
+                Сохранить
+              </button>
+              <button onClick={cancel}>Отмена</button>
+            </footer>
+            <small className="pe-inline-state">
+              {status}
+              {hasSelection(f?.selection ?? null) && " · выделение временное"} ·
+              исходник не меняется
+            </small>
+          </section>
         ) : (
           <>
             <header className="pe-header">
@@ -903,8 +1529,22 @@ export function PaintEditor({
               />
               <span className="pe-save-status" role="status">
                 {status}
+                {hasSelection(f?.selection ?? null) && " · Выделение временное"}
               </span>
               <div className="pe-buttons">
+                <button
+                  className="primary"
+                  disabled={loading || processing || refining}
+                  onClick={saveAndClose}
+                >
+                  Сохранить
+                </button>
+                <button onClick={cancel}>Отмена</button>
+                {canInline && (
+                  <button onClick={() => setExpanded(false)}>
+                    <Minimize2 size={16} /> Свернуть в карточку
+                  </button>
+                )}
                 <ToolButton
                   label="Отменить · Ctrl / ⌘ Z"
                   disabled={!s?.past.length && !s?.transaction}
@@ -936,24 +1576,37 @@ export function PaintEditor({
                 >
                   <Download size={16} /> PNG
                 </button>
-                <button className="primary" onClick={close}>
-                  Готово
-                </button>
               </div>
             </header>
             <div className="pe-context">
-              <div className="pe-modes" aria-label="Операция выделения">
-                {(Object.keys(MODES) as SelectionMode[]).map((m) => (
-                  <button
-                    key={m}
-                    disabled={refining}
-                    aria-pressed={mode === m}
-                    onClick={() => action(() => setMode(m))}
-                  >
-                    {MODES[m]}
-                  </button>
-                ))}
-              </div>
+              <strong className="pe-active-tool">
+                {tools.find(([key]) => key === tool)?.[1]}
+              </strong>
+              {modeTool && (
+                <div
+                  className="pe-modes"
+                  role="group"
+                  aria-label="Операция выделения"
+                >
+                  {(Object.keys(MODES) as SelectionMode[]).map((m) => (
+                    <button
+                      key={m}
+                      disabled={
+                        refining || (m === "intersect" && !selectionAvailable)
+                      }
+                      title={
+                        m === "intersect" && !selectionAvailable
+                          ? "Сначала создайте выделение"
+                          : undefined
+                      }
+                      aria-pressed={mode === m}
+                      onClick={() => action(() => setMode(m))}
+                    >
+                      {MODES[m]}
+                    </button>
+                  ))}
+                </div>
+              )}
               {tool === "wand" ? (
                 <>
                   <PaintRange
@@ -962,39 +1615,18 @@ export function PaintEditor({
                     max={100}
                     onChange={(v) => {
                       setTolerance(v);
-                      runWand({ tolerance: v, contiguous, diagonal });
+                      recalcWand({ tolerance: v });
                     }}
                   />
-                  <label className="pe-check">
-                    <input
-                      type="checkbox"
-                      checked={contiguous}
-                      onChange={(e) => {
-                        setContiguous(e.target.checked);
-                        runWand({
-                          tolerance,
-                          contiguous: e.target.checked,
-                          diagonal,
-                        });
-                      }}
-                    />{" "}
-                    Только смежная область
-                  </label>
-                  <label className="pe-check">
-                    <input
-                      type="checkbox"
-                      checked={diagonal}
-                      onChange={(e) => {
-                        setDiagonal(e.target.checked);
-                        runWand({
-                          tolerance,
-                          contiguous,
-                          diagonal: e.target.checked,
-                        });
-                      }}
-                    />{" "}
-                    8 соседей
-                  </label>
+                  <PaintRange
+                    label="Мягкий край ΔE"
+                    value={edgeSoftness}
+                    max={10}
+                    onChange={(value) => {
+                      setEdgeSoftness(value);
+                      recalcWand({ edgeSoftness: value });
+                    }}
+                  />
                 </>
               ) : ["select-brush", "select-erase", "brush", "erase"].includes(
                   tool,
@@ -1025,7 +1657,7 @@ export function PaintEditor({
               ) : (
                 <p className="pe-hint">
                   {tool === "polygon"
-                    ? "Клики — вершины · Enter — замкнуть · Backspace — убрать вершину · Esc — отменить"
+                    ? "Клик — вершина · Enter или двойной клик — замкнуть · Backspace — убрать точку · Esc — отменить"
                     : tool === "lasso"
                       ? "Обведите деталь, удерживая кнопку мыши. Контур замкнётся при отпускании."
                       : "Перетаскивайте изображение. Пробел временно включает перемещение."}
@@ -1047,14 +1679,28 @@ export function PaintEditor({
               </nav>
               <div className="pe-center">
                 <div className="pe-selection-bar">
-                  <span>
-                    {processing
-                      ? "Вычисляем выделение…"
-                      : f?.editing
-                        ? "Редактирование области слоя"
-                        : hasSelection(f?.selection ?? null)
-                          ? "Выделение готово"
-                          : "Выделите деталь на фото"}
+                  <span
+                    role="status"
+                    title={
+                      polygon.current.length
+                        ? "Enter или двойной клик — завершить полигон; Backspace — убрать точку; Escape — отменить"
+                        : limitExplanation
+                    }
+                  >
+                    {polygon.current.length
+                      ? `Вершин: ${polygon.current.length} · Enter/двойной клик — завершить`
+                      : processing
+                        ? "Вычисляем выделение…"
+                        : !workerReady && tool === "wand"
+                          ? "Подготавливаем палочку…"
+                          : f?.editing
+                            ? "Редактирование области слоя"
+                            : hasSelection(f?.selection ?? null)
+                              ? "Выделение готово"
+                              : (tool === "brush" || tool === "erase") && active
+                                ? "Нет выделения — кисть рисует по всему слою"
+                                : "Выделите деталь на фото"}
+                    {limitShort}
                   </span>
                   {f?.editing ? (
                     <>
@@ -1075,6 +1721,7 @@ export function PaintEditor({
                       disabled={
                         processing ||
                         !hasSelection(f?.selection ?? null) ||
+                        (selectionRisk !== null && !riskAccepted) ||
                         refining
                       }
                       onClick={() =>
@@ -1088,6 +1735,9 @@ export function PaintEditor({
                     >
                       Слой из выделения
                     </button>
+                  )}
+                  {processing && (
+                    <button onClick={cancelOperation}>Отменить расчёт</button>
                   )}
                   <details className="pe-selection-menu">
                     <summary>Выделение</summary>
@@ -1115,7 +1765,7 @@ export function PaintEditor({
                         Инвертировать
                       </button>
                       <button
-                        disabled={processing}
+                        disabled={processing || !selectionAvailable}
                         onClick={() =>
                           action(() =>
                             s?.change({
@@ -1160,7 +1810,7 @@ export function PaintEditor({
                       max={20}
                       onChange={(v) => {
                         setGrow(v);
-                        runRefine(v, feather);
+                        recalcRefine(v, feather);
                       }}
                     />
                     <PaintRange
@@ -1169,7 +1819,7 @@ export function PaintEditor({
                       max={20}
                       onChange={(v) => {
                         setFeather(v);
-                        runRefine(grow, v);
+                        recalcRefine(grow, v);
                       }}
                     />
                     <button
@@ -1184,62 +1834,7 @@ export function PaintEditor({
                     <button onClick={cancelOperation}>Отмена края</button>
                   </div>
                 )}
-                <div className="pe-stage" ref={stage}>
-                  <div
-                    className="pe-plane"
-                    style={{
-                      minWidth: w * zoom + 48,
-                      minHeight: h * zoom + 48,
-                    }}
-                  >
-                    <div
-                      className="pe-image"
-                      style={{
-                        width: w * zoom,
-                        height: h * zoom,
-                        cursor:
-                          space || tool === "pan"
-                            ? "grab"
-                            : [
-                                  "brush",
-                                  "erase",
-                                  "select-brush",
-                                  "select-erase",
-                                ].includes(tool)
-                              ? "none"
-                              : "crosshair",
-                      }}
-                    >
-                      <canvas
-                        ref={main}
-                        width={w}
-                        height={h}
-                        aria-label="Изображение для выделения и перекраски"
-                        onPointerDown={down}
-                        onPointerMove={move}
-                        onPointerUp={up}
-                        onPointerCancel={() => {
-                          cancelGesture();
-                        }}
-                        onPointerLeave={() => {
-                          if (cursor.current)
-                            cursor.current.style.display = "none";
-                        }}
-                        onDoubleClick={(e) => {
-                          e.preventDefault();
-                          if (tool === "polygon") completePolygon();
-                        }}
-                      />
-                      <canvas
-                        className="pe-overlay"
-                        ref={maskView}
-                        width={w}
-                        height={h}
-                      />
-                      <div className="pe-cursor" ref={cursor} />
-                    </div>
-                  </div>
-                </div>
+                {imageStage}
                 <footer className="pe-footer">
                   <div className="pe-buttons">
                     <ToolButton
@@ -1323,20 +1918,7 @@ export function PaintEditor({
                   material={active?.material ?? material}
                   color={active?.color ?? color}
                   onColor={chooseColor}
-                  onColorPreview={(value) => {
-                    const hex = normalizeHex(value);
-                    if (!hex) return;
-                    if (operation.current) finishOperation();
-                    setColor(hex);
-                    setMaterial(undefined);
-                    if (s.active)
-                      s.patch(
-                        s.active.id,
-                        { color: hex, material: undefined },
-                        true,
-                      );
-                    refresh();
-                  }}
+                  onColorPreview={previewColor}
                   onCatalog={() => setPicker(true)}
                   action={action}
                   refresh={refresh}
@@ -1345,6 +1927,18 @@ export function PaintEditor({
               )}
             </div>
           </>
+        )}
+        {selectionRisk !== null && !riskAccepted && (
+          <div className="pe-selection-warning" role="alert">
+            <span>
+              Палочка захватила {Math.round(selectionRisk * 100)}% кадра и его
+              края. Вероятно, выделен фон. Уменьшите допуск или уточните
+              выделение лассо и кистью.
+            </span>
+            <button onClick={() => setRiskAccepted(true)}>
+              Использовать эту маску
+            </button>
+          </div>
         )}
         {error && (
           <div className="pe-error" role="alert">
@@ -1372,6 +1966,14 @@ export function PaintEditor({
           }}
         />
       )}
-    </Modal>
+    </>
   );
+  if (expanded || !inlineHostId) {
+    return (
+      <Modal title="Виртуальная покраска" wide onClose={dismiss}>
+        {content}
+      </Modal>
+    );
+  }
+  return inlineHost ? createPortal(content, inlineHost) : null;
 }

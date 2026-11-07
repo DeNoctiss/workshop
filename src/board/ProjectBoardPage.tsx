@@ -31,19 +31,22 @@ import {
   ArrowUp,
   ArrowDown,
   FolderOpen,
+  Search,
+  Plus,
+  ListTree,
 } from "lucide-react";
 import { useApp } from "../components/context";
 import { Empty, Modal, Photo, Field } from "../components/ui";
 import { Paged } from "../components/Paged";
-import { uid, type AssetMeta, type Material } from "../domain/model";
+import { now, uid, type AssetMeta, type Material } from "../domain/model";
 import type {
   BoardData,
   BoardNode,
   MaterialReference,
 } from "../domain/workspace";
-import { updateAssetMeta, removeAsset } from "../data/db";
+import { db, updateAssetMeta, removeAsset } from "../data/db";
 import { prepareImage } from "../data/images";
-import { BoardCard, BoardActions } from "./BoardCard";
+import { BoardCard, BoardActions, nodeLabels } from "./BoardCard";
 import { PaintEditor } from "../paint/PaintEditor";
 import { NodeEditor } from "./NodeEditor";
 import {
@@ -55,6 +58,8 @@ import {
   type EdgeDirection,
   groupNodes,
   ungroupNodes,
+  absolutePosition,
+  findFreePosition,
 } from "./operations";
 import { CatalogPicker } from "../catalog/CatalogPicker";
 import { newMaterial, findProduct, defaultUnit } from "../catalog/catalog";
@@ -81,30 +86,131 @@ function BoardCanvas({ projectId }: { projectId: string }) {
   }, [graph.revision, flow, current]);
   const [newPaint, setNewPaint] = useState(false);
   const [editing, setEditing] = useState<string | null>(null),
+    [switchWarning, setSwitchWarning] = useState(false),
     [pendingNode, setPendingNode] = useState<BoardNode | null>(null),
+    [overviewQuery, setOverviewQuery] = useState(""),
     [picker, setPicker] = useState(false),
     [filesOpen, setFilesOpen] = useState(false),
     [full, setFull] = useState<AssetMeta | null>(null),
     [material, setMaterial] = useState<{
       draft: Material;
       ref: MaterialReference;
+      nodeId: string;
     } | null>(null),
     [free, setFree] = useState(false),
     [freeName, setFreeName] = useState(""),
     [freeColor, setFreeColor] = useState("#9b7562");
   const selected = graph.nodes.filter((n) => n.selected).map((n) => n.id),
+    boardLocked =
+      !!editing &&
+      graph.nodes.some((n) => n.id === editing && n.data.kind === "paint"),
     groups = graph.nodes
       .filter((n) => n.selected && n.data.kind === "group")
       .map((n) => n.id);
-  const center = () => {
+  const visibleNodes = graph.nodes.filter((n) => {
+    const data = n.data;
+    const extra =
+      data.kind === "note"
+        ? data.text
+        : data.kind === "material"
+          ? data.material.snapshot.label
+          : data.kind === "palette"
+            ? data.colors.map((c) => c.snapshot.label).join(" ")
+            : "";
+    return `${data.title} ${extra}`
+      .toLocaleLowerCase("ru")
+      .includes(overviewQuery.trim().toLocaleLowerCase("ru"));
+  });
+  const openEditor = (id: string) => {
+    if (editing && editing !== id) {
+      setSwitchWarning(true);
+      return;
+    }
+    setEditing(id);
+    const node = current.current.nodes.find((n) => n.id === id);
+    if (
+      node?.data.kind === "paint" &&
+      !window.matchMedia("(max-width: 760px)").matches
+    )
+      requestAnimationFrame(
+        () => void flow.fitView({ nodes: [node], padding: 0.18, maxZoom: 1 }),
+      );
+  };
+  const paintFromImage = (assetId: string) => {
+    if (editing || newPaint) {
+      setSwitchWarning(true);
+      return;
+    }
+    void act(async () => {
+      const asset = await db.assets.get(assetId);
+      if (!asset || asset.projectId !== projectId)
+        throw new Error("Исходное фото проекта не найдено");
+      const image = await createImageBitmap(asset.blob);
+      const scale = Math.min(1, 2048 / Math.max(image.width, image.height));
+      const width = Math.max(1, Math.round(image.width * scale));
+      const height = Math.max(1, Math.round(image.height * scale));
+      image.close();
+      const id = insert({
+        kind: "paint",
+        title: "Вариант окраски",
+        document: {
+          id: uid(),
+          schemaVersion: 2,
+          sourceAssetId: assetId,
+          previewAssetId: "",
+          width,
+          height,
+          layers: [],
+          updatedAt: now(),
+        },
+      });
+      if (!(await doc.flush()))
+        throw new Error("Не удалось сохранить новую карточку перекраски");
+      openEditor(id);
+    }, "Вариант окраски создан");
+  };
+  const center = (width = 280, height = 260) => {
     const r = root.current?.getBoundingClientRect();
-    return flow.screenToFlowPosition({
-      x: (r?.left ?? 0) + (r?.width ?? 800) / 2 - 140,
-      y: (r?.top ?? 0) + 100,
+    const point = flow.screenToFlowPosition({
+      x: (r?.left ?? 0) + (r?.width ?? 800) / 2,
+      y: (r?.top ?? 0) + (r?.height ?? 600) / 2,
+    });
+    return { x: point.x - width / 2, y: point.y - height / 2 };
+  };
+  const freePosition = (data: BoardData, nodes = current.current.nodes) => {
+    const node = createNode(data);
+    const width = Number(node.style?.width) || 280;
+    const height = Number(node.style?.height) || 260;
+    return findFreePosition(nodes, center(width, height), { width, height });
+  };
+  const reveal = (node: BoardNode) => {
+    requestAnimationFrame(() => {
+      const r = root.current?.getBoundingClientRect();
+      if (!r) return;
+      const width = Number(node.style?.width) || 280;
+      const height = Number(node.style?.height) || 260;
+      const topLeft = flow.flowToScreenPosition(node.position);
+      const bottomRight = flow.flowToScreenPosition({
+        x: node.position.x + width,
+        y: node.position.y + height,
+      });
+      if (
+        topLeft.x < r.left + 24 ||
+        topLeft.y < r.top + 24 ||
+        bottomRight.x > r.right - 24 ||
+        bottomRight.y > r.bottom - 24
+      )
+        void flow.setCenter(
+          node.position.x + width / 2,
+          node.position.y + height / 2,
+          {
+            zoom: flow.getZoom(),
+          },
+        );
     });
   };
-  const insert = (data: BoardData, position = center()) => {
-    const node = createNode(data, position);
+  const insert = (data: BoardData, position?: { x: number; y: number }) => {
+    const node = createNode(data, position ?? freePosition(data));
     change({
       ...current.current,
       nodes: [
@@ -112,11 +218,12 @@ function BoardCanvas({ projectId }: { projectId: string }) {
         { ...node, selected: true },
       ],
     });
+    reveal(node);
     return node.id;
   };
   const simple = (
     kind: "note" | "checklist" | "group" | "palette" | "link",
-    position = center(),
+    position?: { x: number; y: number },
   ) => {
     const data: BoardData =
       kind === "note"
@@ -129,7 +236,29 @@ function BoardCanvas({ projectId }: { projectId: string }) {
               ? { kind, title: "Ссылка", url: "" }
               : { kind, title: "Группа" };
     if (kind === "group") insert(data, position);
-    else setPendingNode(createNode(data, position));
+    else setPendingNode(createNode(data, position ?? freePosition(data)));
+  };
+  const locate = (id: string) => {
+    const node = current.current.nodes.find((n) => n.id === id);
+    if (!node) return;
+    change(
+      {
+        ...current.current,
+        nodes: current.current.nodes.map((n) => ({
+          ...n,
+          selected: n.id === id,
+        })),
+      },
+      false,
+      false,
+    );
+    const position = absolutePosition(node, current.current.nodes);
+    void flow.setCenter(
+      position.x + (Number(node.style?.width) || 280) / 2,
+      position.y + (Number(node.style?.height) || 260) / 2,
+      { zoom: Math.max(flow.getZoom(), 0.65) },
+    );
+    root.current?.focus();
   };
   const removeSelected = () => {
     const ids = current.current.nodes
@@ -145,7 +274,7 @@ function BoardCanvas({ projectId }: { projectId: string }) {
       },
     );
   };
-  async function upload(files: File[], position = center()) {
+  async function upload(files: File[], position?: { x: number; y: number }) {
     if (!files.length) return;
     await act(async () => {
       const prepared = await Promise.all(
@@ -154,28 +283,40 @@ function BoardCanvas({ projectId }: { projectId: string }) {
         ),
       );
       doc.addAssets(prepared);
-      change({
-        ...current.current,
-        nodes: [
-          ...current.current.nodes,
-          ...prepared.map((a, i) =>
-            createNode(
-              { kind: "image", title: a.caption, assetId: a.id },
-              {
+      const nodes = current.current.nodes.map((node) => ({
+        ...node,
+        selected: false,
+      }));
+      const additions = prepared.map((a, i) => {
+        const data: BoardData = {
+          kind: "image",
+          title: a.caption,
+          assetId: a.id,
+        };
+        const node = createNode(
+          data,
+          position
+            ? {
                 x: position.x + (i % 3) * 310,
                 y: position.y + Math.floor(i / 3) * 290,
-              },
-            ),
-          ),
-        ],
+              }
+            : freePosition(data, nodes),
+        );
+        nodes.push({ ...node, selected: i === prepared.length - 1 });
+        return node;
       });
+      change({
+        ...current.current,
+        nodes,
+      });
+      reveal(additions[additions.length - 1]);
       if (!(await doc.flush()))
         throw new Error(
           "Изображения пока не сохранены. Повторите сохранение доски.",
         );
     }, "Изображения добавлены на доску");
   }
-  const addStock = (ref: MaterialReference) => {
+  const addStock = (ref: MaterialReference, nodeId: string) => {
     const existing = state.materials.find(
         (m) => m.id === ref.inventoryMaterialId,
       ),
@@ -188,16 +329,23 @@ function BoardCanvas({ projectId }: { projectId: string }) {
       draft.color = ref.snapshot.colorHex ?? "";
       draft.colorEnabled = !!ref.snapshot.colorHex;
     }
-    setMaterial({ draft, ref });
+    setMaterial({ draft, ref, nodeId });
   };
   const nodeChanges = (changes: NodeChange<BoardNode>[]) => {
-    const significant = changes.some(
+    const editingPaint =
+      current.current.nodes.find((n) => n.id === editing)?.data.kind ===
+      "paint";
+    const relevant = changes.filter(
+      (c) => !(editingPaint && c.type === "dimensions" && c.id === editing),
+    );
+    if (!relevant.length) return;
+    const significant = relevant.some(
       (c) =>
         (c.type === "position" && !!c.position) ||
         (c.type === "dimensions" && !!c.setAttributes),
     );
-    const next = applyNodeChanges(changes, current.current.nodes).map((n) => {
-      const resize = changes.find(
+    const next = applyNodeChanges(relevant, current.current.nodes).map((n) => {
+      const resize = relevant.find(
         (c) => c.type === "dimensions" && c.id === n.id && c.setAttributes,
       );
       return resize?.type === "dimensions" && resize.dimensions
@@ -237,13 +385,19 @@ function BoardCanvas({ projectId }: { projectId: string }) {
           role="status"
           className={"save-status " + (doc.error ? "error" : "")}
         >
-          {doc.status}
+          {boardLocked ? "Доска: " + doc.status : doc.status}
         </span>
         <button onClick={() => setFilesOpen(true)}>
           <FolderOpen size={17} />
           Файлы проекта
         </button>
       </div>
+      {switchWarning && (
+        <div className="board-error" role="alert">
+          <span>Сначала сохраните или отмените открытую перекраску.</span>
+          <button onClick={() => setSwitchWarning(false)}>Понятно</button>
+        </div>
+      )}
       {doc.error && (
         <div className="board-error" role="alert">
           <p>{doc.error}</p>
@@ -285,7 +439,7 @@ function BoardCanvas({ projectId }: { projectId: string }) {
         </div>
       )}
       <div className="board-toolbar">
-        <label className="button">
+        <label className="button board-add-primary">
           <ImagePlus size={17} />
           Фото
           <input
@@ -301,73 +455,206 @@ function BoardCanvas({ projectId }: { projectId: string }) {
             }}
           />
         </label>
-        {(
-          [
-            ["note", "Заметка", StickyNote],
-            ["checklist", "Чек-лист", CheckSquare],
-            ["group", "Группа", Layers],
-            ["palette", "Палитра", Palette],
-            ["link", "Ссылка", Link],
-          ] as const
-        ).map(([kind, label, Icon]) => (
-          <button
-            key={kind}
-            draggable
-            onDragStart={(e) =>
-              e.dataTransfer.setData("application/workshop-node", kind)
-            }
-            onClick={() => simple(kind)}
-          >
-            <Icon size={17} />
-            {label}
-          </button>
-        ))}
-        <button onClick={() => setPicker(true)}>
-          <Package size={17} />
-          Материал
+        <button
+          className="board-add-primary"
+          draggable
+          disabled={busy}
+          onDragStart={(e) =>
+            e.dataTransfer.setData("application/workshop-node", "note")
+          }
+          onClick={() => simple("note")}
+        >
+          <StickyNote size={17} />
+          Заметка
         </button>
-        <button onClick={() => setFree(true)}>Своя смесь</button>
-        <button onClick={() => setNewPaint(true)}>
+        <button
+          className="board-add-primary"
+          disabled={busy || !!editing}
+          title={editing ? "Завершите открытое редактирование" : undefined}
+          onClick={() => setNewPaint(true)}
+        >
           <Palette size={17} />
           Перекраска
         </button>
+        <details className="board-popover board-add-menu">
+          <summary className="button">
+            <Plus size={17} />
+            Ещё карточки
+          </summary>
+          <div
+            className="board-popover-content"
+            onClick={(e) => {
+              if ((e.target as Element).closest("button"))
+                e.currentTarget.parentElement?.removeAttribute("open");
+            }}
+          >
+            <small>Текст и структура</small>
+            {(
+              [
+                ["checklist", "Чек-лист", CheckSquare],
+                ["group", "Группа", Layers],
+                ["link", "Ссылка", Link],
+              ] as const
+            ).map(([kind, label, Icon]) => (
+              <button
+                key={kind}
+                draggable
+                disabled={busy}
+                onDragStart={(e) =>
+                  e.dataTransfer.setData("application/workshop-node", kind)
+                }
+                onClick={() => simple(kind)}
+              >
+                <Icon size={17} />
+                {label}
+              </button>
+            ))}
+            <small>Материалы и цвета · без расхода</small>
+            <button disabled={busy} onClick={() => setPicker(true)}>
+              <Package size={17} />
+              Материал
+            </button>
+            <button
+              draggable
+              disabled={busy}
+              onDragStart={(e) =>
+                e.dataTransfer.setData("application/workshop-node", "palette")
+              }
+              onClick={() => simple("palette")}
+            >
+              <Palette size={17} />
+              Палитра
+            </button>
+            <button disabled={busy} onClick={() => setFree(true)}>
+              <Palette size={17} />
+              Цветовой образец
+            </button>
+          </div>
+        </details>
+        <details className="board-popover board-overview">
+          <summary className="button">
+            <ListTree size={17} />
+            Карточки <span>{graph.nodes.length}</span>
+          </summary>
+          <div className="board-popover-content board-overview-content">
+            <label className="search">
+              <Search size={17} />
+              <input
+                aria-label="Найти карточку на доске"
+                placeholder="Название или текст…"
+                value={overviewQuery}
+                onChange={(e) => setOverviewQuery(e.target.value)}
+              />
+            </label>
+            <div className="board-overview-results">
+              {visibleNodes.slice(0, 50).map((node) => {
+                const detail =
+                  node.data.kind === "note"
+                    ? node.data.text
+                    : node.data.kind === "material"
+                      ? node.data.material.snapshot.label
+                      : node.data.kind === "palette"
+                        ? node.data.colors
+                            .map((c) => c.snapshot.label)
+                            .join(", ")
+                        : "";
+                return (
+                  <button
+                    key={node.id}
+                    onClick={(e) => {
+                      locate(node.id);
+                      e.currentTarget
+                        .closest("details")
+                        ?.removeAttribute("open");
+                    }}
+                  >
+                    <span>{node.data.title || nodeLabels[node.data.kind]}</span>
+                    <small>
+                      {nodeLabels[node.data.kind]}
+                      {detail ? " · " + detail : ""}
+                    </small>
+                  </button>
+                );
+              })}
+              {!visibleNodes.length && (
+                <p className="muted">Карточки не найдены.</p>
+              )}
+              {visibleNodes.length > 50 && (
+                <p className="muted">
+                  Уточните поиск, чтобы увидеть остальные.
+                </p>
+              )}
+            </div>
+          </div>
+        </details>
         <span className="toolbar-divider" />
-        <button
-          className="icon"
-          title="Отменить · Ctrl+Z"
-          aria-label="Отменить действие доски"
-          disabled={!doc.canUndo}
-          onClick={() => undo()}
-        >
-          <Undo2 size={17} />
-        </button>
-        <button
-          className="icon"
-          aria-label="Повторить действие доски"
-          disabled={!doc.canRedo}
-          onClick={() => undo(true)}
-        >
-          <Redo2 size={17} />
-        </button>
+        <div className="board-history-actions">
+          <button
+            className="icon"
+            title="Отменить · Ctrl+Z"
+            aria-label="Отменить действие доски"
+            disabled={!doc.canUndo || boardLocked}
+            onClick={() => undo()}
+          >
+            <Undo2 size={17} />
+          </button>
+          <button
+            className="icon"
+            title="Повторить · Ctrl+Shift+Z"
+            aria-label="Повторить действие доски"
+            disabled={!doc.canRedo || boardLocked}
+            onClick={() => undo(true)}
+          >
+            <Redo2 size={17} />
+          </button>
+        </div>
       </div>
       {!!selected.length && (
         <div className="board-selection">
-          <span>Выбрано: {selected.length}</span>
+          <div className="board-selection-info">
+            <strong>
+              {selected.length === 1
+                ? graph.nodes.find((n) => n.id === selected[0])?.data.title ||
+                  "Карточка"
+                : `Выбрано карточек: ${selected.length}`}
+            </strong>
+            <small>
+              Тяните за заголовок; края выбранной карточки меняют размер.
+            </small>
+          </div>
+          {selected.length === 1 && (
+            <button onClick={() => openEditor(selected[0])}>
+              Редактировать
+            </button>
+          )}
+          <button
+            onClick={() =>
+              void flow.fitView({
+                nodes: graph.nodes.filter((n) => selected.includes(n.id)),
+                padding: 0.3,
+                maxZoom: 1.25,
+              })
+            }
+          >
+            Вписать выбранное
+          </button>
           <button
             onClick={() => change(duplicateNodes(current.current, selected))}
+            disabled={boardLocked}
           >
             <Copy size={16} />
             Копия
           </button>
           <button
             onClick={() => change(groupNodes(current.current, selected))}
-            disabled={selected.length === groups.length}
+            disabled={boardLocked || selected.length === groups.length}
           >
             <Group size={16} />В группу
           </button>
           {!!groups.length && (
             <button
               onClick={() => change(ungroupNodes(current.current, groups))}
+              disabled={boardLocked}
             >
               <Ungroup size={16} />
               Разгруппировать
@@ -376,6 +663,7 @@ function BoardCanvas({ projectId }: { projectId: string }) {
           <button
             aria-label="На передний план"
             title="На передний план"
+            disabled={boardLocked}
             onClick={() => {
               const top =
                 Math.max(0, ...graph.nodes.map((n) => n.zIndex ?? 0)) + 1;
@@ -394,6 +682,7 @@ function BoardCanvas({ projectId }: { projectId: string }) {
           <button
             aria-label="На задний план"
             title="На задний план"
+            disabled={boardLocked}
             onClick={() =>
               change({
                 ...current.current,
@@ -407,7 +696,11 @@ function BoardCanvas({ projectId }: { projectId: string }) {
           >
             <ArrowDown size={16} />
           </button>
-          <button className="danger-text" onClick={removeSelected}>
+          <button
+            className="danger-text"
+            disabled={boardLocked}
+            onClick={removeSelected}
+          >
             <Trash2 size={16} />
             Удалить
           </button>
@@ -463,7 +756,9 @@ function BoardCanvas({ projectId }: { projectId: string }) {
         ref={root}
         tabIndex={0}
         onKeyDown={(e) => {
-          if ((e.target as Element).closest("input,textarea,select,dialog"))
+          if (boardLocked) return;
+          const target = e.target as Element;
+          if (target.closest("input,textarea,select,dialog,[contenteditable]"))
             return;
           if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
             e.preventDefault();
@@ -475,6 +770,7 @@ function BoardCanvas({ projectId }: { projectId: string }) {
               change(duplicateNodes(current.current, selected));
           }
           if (e.key === "Delete" || e.key === "Backspace") {
+            if (target.closest("button,a,summary")) return;
             e.preventDefault();
             removeSelected();
           }
@@ -482,7 +778,10 @@ function BoardCanvas({ projectId }: { projectId: string }) {
       >
         <BoardActions.Provider
           value={{
-            edit: setEditing,
+            edit: openEditor,
+            paintFromImage,
+            editingPaintId:
+              editNode?.data.kind === "paint" ? editNode.id : null,
             openImage: setFull,
             addStock,
             resizeStart: doc.checkpoint,
@@ -510,6 +809,16 @@ function BoardCanvas({ projectId }: { projectId: string }) {
             nodes={graph.nodes.map((n) => ({
               ...n,
               dragHandle: ".board-card-heading",
+              style:
+                editing === n.id &&
+                n.data.kind === "paint" &&
+                !window.matchMedia("(max-width: 760px)").matches
+                  ? {
+                      ...n.style,
+                      width: Math.max(Number(n.style?.width) || 0, 460),
+                      height: Math.max(Number(n.style?.height) || 0, 540),
+                    }
+                  : n.style,
             }))}
             edges={graph.edges.map((e) => {
               const direction = e.data?.direction ?? "forward";
@@ -553,7 +862,7 @@ function BoardCanvas({ projectId }: { projectId: string }) {
                 false,
               )
             }
-            onNodeDoubleClick={(_, n) => setEditing(n.id)}
+            onNodeDoubleClick={(_, n) => openEditor(n.id)}
             onConnect={(c) =>
               change({
                 ...current.current,
@@ -578,6 +887,16 @@ function BoardCanvas({ projectId }: { projectId: string }) {
             }}
             minZoom={0.15}
             maxZoom={2.5}
+            ariaLabelConfig={{
+              "controls.ariaLabel": "Управление доской",
+              "controls.zoomIn.ariaLabel": "Увеличить масштаб доски",
+              "controls.zoomOut.ariaLabel": "Уменьшить масштаб доски",
+              "controls.fitView.ariaLabel": "Вписать все карточки",
+              "controls.interactive.ariaLabel":
+                "Переключить редактирование доски",
+              "minimap.ariaLabel": "Обзор доски",
+              "handle.ariaLabel": "Точка связи карточки",
+            }}
             deleteKeyCode={null}
             multiSelectionKeyCode="Shift"
             colorMode={state.settings.theme}
@@ -634,19 +953,25 @@ function BoardCanvas({ projectId }: { projectId: string }) {
       </div>
       <p className="board-help">
         Тяните за заголовок; края меняют размер. Shift — несколько карточек.
-        Колесо — масштаб, пустое место — перемещение. Двойной клик —
-        редактирование. Перенесите центр карточки в группу для привязки;
-        вынесите наружу для отсоединения. Клик по линии — направление и удаление
-        связи.
+        Колесо над полотном и фото — масштаб, внутри длинной карточки —
+        прокрутка. Пустое место — перемещение. Двойной клик — редактирование.
+        Перенесите центр карточки в группу для привязки; вынесите наружу для
+        отсоединения. Клик по линии — направление и удаление связи.
       </p>
       {(newPaint || editNode?.data.kind === "paint") && (
         <PaintEditor
           key={editNode?.id ?? "new-paint"}
           projectId={projectId}
           initial={editNode?.data.kind === "paint" ? editNode.data : undefined}
+          inlineHostId={
+            editNode?.data.kind === "paint"
+              ? "paint-inline-" + editNode.id
+              : undefined
+          }
           onClose={() => {
             setNewPaint(false);
             setEditing(null);
+            setSwitchWarning(false);
           }}
           onSave={async (data, prepared) => {
             doc.addAssets(prepared);
@@ -710,11 +1035,11 @@ function BoardCanvas({ projectId }: { projectId: string }) {
           initial={material.draft}
           onClose={() => setMaterial(null)}
           onSaved={(m) => {
-            const ref = material.ref;
+            const { ref, nodeId } = material;
             change({
               ...current.current,
               nodes: current.current.nodes.map((n) =>
-                n.data.kind === "material" && n.data.material === ref
+                n.id === nodeId && n.data.kind === "material"
                   ? {
                       ...n,
                       data: {

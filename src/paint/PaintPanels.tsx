@@ -1,15 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
-import {
-  ArrowDown,
-  ArrowUp,
-  Copy,
-  Eye,
-  EyeOff,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { ArrowDown, ArrowUp, Copy, Eye, EyeOff, Trash2 } from "lucide-react";
 import { PaintSession, blendLabels } from "./core/PaintSession";
-import { hasSelection } from "./core/selection";
 import type { PaintBlend, MaterialReference } from "../domain/workspace";
 export function ToolButton({
   label,
@@ -29,6 +20,7 @@ export function ToolButton({
       type="button"
       className="pe-tool"
       aria-label={label}
+      title={label}
       aria-pressed={selected}
       data-tip={label}
       onClick={onClick}
@@ -202,14 +194,6 @@ export function PaintPanels({
             ))}
           </div>
           <button
-            disabled={
-              locked || !hasSelection(f.selection) || f.layers.length >= 12
-            }
-            onClick={() => action(() => session.addLayer(color, material))}
-          >
-            <Plus size={16} /> Слой из выделения
-          </button>
-          <button
             disabled={locked || f.layers.length >= 12}
             onClick={() =>
               action(() => session.addLayer(color, material, true))
@@ -373,7 +357,7 @@ export function PaintPanels({
           )}
           <p className="pe-hint">
             Изменение цвета не расходует материал со склада. Для сохранения
-            теней попробуйте режим «Цвет» на вкладке «Слои».
+            теней выберите режим «Светотень» на вкладке «Слои».
           </p>
           <div className="pe-palette">
             {[

@@ -22,9 +22,11 @@ import {
 import { stock } from "../domain/engine";
 export const BoardActions = createContext<{
   edit: (id: string) => void;
+  paintFromImage: (assetId: string) => void;
+  editingPaintId: string | null;
   toggle: (id: string, itemId: string) => void;
   openImage: (a: AssetMeta) => void;
-  addStock: (r: MaterialReference) => void;
+  addStock: (r: MaterialReference, nodeId: string) => void;
   resizeStart: () => void;
   resizeEnd: () => void;
 }>(null!);
@@ -48,7 +50,13 @@ const icons = {
   palette: Palette,
   link: ExternalLink,
 };
-function MaterialContent({ reference: r }: { reference: MaterialReference }) {
+function MaterialContent({
+  reference: r,
+  nodeId,
+}: {
+  reference: MaterialReference;
+  nodeId: string;
+}) {
   const { state } = useApp(),
     actions = useContext(BoardActions);
   const materials = r.inventoryMaterialId
@@ -82,7 +90,7 @@ function MaterialContent({ reference: r }: { reference: MaterialReference }) {
             </Badge>
             <button
               onClick={() =>
-                actions.addStock({ ...r, inventoryMaterialId: m.id })
+                actions.addStock({ ...r, inventoryMaterialId: m.id }, nodeId)
               }
             >
               Открыть материал
@@ -92,7 +100,10 @@ function MaterialContent({ reference: r }: { reference: MaterialReference }) {
       ) : (
         <>
           <Badge>Нет на складе</Badge>
-          <button className="nodrag" onClick={() => actions.addStock(r)}>
+          <button
+            className="nodrag nopan"
+            onClick={() => actions.addStock(r, nodeId)}
+          >
             Добавить в материалы
           </button>
         </>
@@ -106,7 +117,7 @@ export const BoardCard = memo(function BoardCard({
   data,
   selected,
 }: NodeProps<BoardNode>) {
-  const { assets } = useApp(),
+  const { assets, busy } = useApp(),
     actions = useContext(BoardActions),
     Icon = icons[data.kind];
   const asset =
@@ -129,7 +140,7 @@ export const BoardCard = memo(function BoardCard({
       }
     >
       <NodeResizer
-        isVisible={!!selected}
+        isVisible={!!selected && actions.editingPaintId !== id}
         minWidth={220}
         minHeight={160}
         onResizeStart={actions.resizeStart}
@@ -139,7 +150,7 @@ export const BoardCard = memo(function BoardCard({
         <Icon size={17} />
         <strong>{data.title || nodeLabels[data.kind]}</strong>
         <button
-          className="icon ghost nodrag"
+          className="icon ghost nodrag nopan nowheel"
           aria-label={"Редактировать: " + nodeLabels[data.kind]}
           onClick={() => actions.edit(id)}
         >
@@ -147,26 +158,45 @@ export const BoardCard = memo(function BoardCard({
         </button>
       </div>
       {data.kind !== "group" && (
-        <div className="board-card-body nodrag nowheel">
-          {data.kind === "paint" && (
-            <>
-              <button
-                className="board-image-open"
-                onClick={() => actions.edit(id)}
-              >
-                {asset ? (
-                  <Photo asset={asset} />
-                ) : (
-                  <span>Подготовка изображения…</span>
-                )}
-              </button>
-              <button onClick={() => actions.edit(id)}>
-                Редактировать окраску
-              </button>
-              <small>
-                {data.document.layers.length} слоёв · оригинал сохранён
-              </small>
-            </>
+        <div
+          className={
+            "board-card-body nodrag nopan" +
+            (["image", "paint"].includes(data.kind) ? "" : " nowheel")
+          }
+          onDoubleClick={(e) => {
+            if ((e.target as Element).closest("button,input,a,label"))
+              e.stopPropagation();
+          }}
+        >
+          {data.kind === "paint" && actions.editingPaintId === id ? (
+            <div
+              id={"paint-inline-" + id}
+              className="board-paint-host nowheel"
+              onDoubleClick={(e) => e.stopPropagation()}
+            >
+              <small>Редактор открыт в рабочем режиме.</small>
+            </div>
+          ) : (
+            data.kind === "paint" && (
+              <>
+                <button
+                  className="board-image-open"
+                  onClick={() => actions.edit(id)}
+                >
+                  {asset ? (
+                    <Photo asset={{ ...asset, caption: data.title }} />
+                  ) : (
+                    <span>Подготовка изображения…</span>
+                  )}
+                </button>
+                <button onClick={() => actions.edit(id)}>
+                  Редактировать окраску
+                </button>
+                <small>
+                  {data.document.layers.length} слоёв · оригинал сохранён
+                </small>
+              </>
+            )
           )}
           {data.kind === "image" &&
             (asset ? (
@@ -182,6 +212,12 @@ export const BoardCard = memo(function BoardCard({
                   </span>
                 </button>
                 {asset.cover && <small>Обложка проекта</small>}
+                <button
+                  disabled={busy}
+                  onClick={() => actions.paintFromImage(data.assetId)}
+                >
+                  <Palette size={16} /> Создать перекраску
+                </button>
               </>
             ) : (
               <p>Изображение не найдено</p>
@@ -213,7 +249,7 @@ export const BoardCard = memo(function BoardCard({
             </>
           )}
           {data.kind === "material" && (
-            <MaterialContent reference={data.material} />
+            <MaterialContent reference={data.material} nodeId={id} />
           )}{" "}
           {data.kind === "palette" && (
             <div className="board-palette-grid">

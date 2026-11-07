@@ -6,6 +6,8 @@ import { derivedAsset, maskCanvas, paintComposite } from "./canvas";
 import type { PaintSession } from "./core/PaintSession";
 export type PaintData = Extract<BoardData, { kind: "paint" }>;
 type Input = {
+  autoSave?: boolean;
+  initialSaved?: boolean;
   session: PaintSession | null;
   base: HTMLCanvasElement | null;
   projectId: string;
@@ -20,11 +22,19 @@ type Input = {
 export function usePaintSave(input: Input) {
   const latest = useRef(input);
   latest.current = input;
-  const [status, setStatus] = useState("Сохранено"),
-    saved = useRef(0),
+  const [status, setStatus] = useState(
+      input.initialSaved ? "Сохранено" : "Не сохранено",
+    ),
+    saved = useRef(input.initialSaved ? 0 : -1),
     running = useRef<Promise<boolean> | null>(null),
     alive = useRef(true),
-    masks = useRef(new WeakMap<Uint8Array, Asset>());
+    masks = useRef(new WeakMap<Uint8Array, Asset>()),
+    previews = useRef(
+      new WeakMap<
+        PaintSession["frame"]["layers"],
+        { asset: Asset; persisted: boolean }
+      >(),
+    );
   useEffect(() => {
     alive.current = true;
     return () => {
@@ -61,13 +71,22 @@ export function usePaintSave(input: Input) {
             const { mask: _mask, ...meta } = layer;
             stored.push({ ...meta, maskAssetId: asset.id });
           }
-          const preview = await derivedAsset(
-            p.projectId,
-            paintComposite(p.base, layers),
-            "paint-preview",
-            p.title,
-          );
-          assets.push(preview);
+          // The preview pixels depend on the immutable layers array; BoardData owns the display title.
+          let cachedPreview = previews.current.get(layers);
+          if (!cachedPreview) {
+            cachedPreview = {
+              asset: await derivedAsset(
+                p.projectId,
+                paintComposite(p.base, layers),
+                "paint-preview",
+                p.title,
+              ),
+              persisted: false,
+            };
+            previews.current.set(layers, cachedPreview);
+          }
+          if (!cachedPreview.persisted) assets.push(cachedPreview.asset);
+          const preview = cachedPreview.asset;
           const ok = await p.onSave(
             {
               kind: "paint",
@@ -86,6 +105,7 @@ export function usePaintSave(input: Input) {
             assets,
           );
           if (!ok) throw Error("Не удалось сохранить. Повторите попытку.");
+          cachedPreview.persisted = true;
           saved.current = revision;
           if (alive.current) setStatus("Сохранено");
           if (!alive.current || s.transaction) return true;
@@ -105,11 +125,20 @@ export function usePaintSave(input: Input) {
     });
     return task;
   }, []);
+  const reuseMask = useCallback((mask: Uint8Array, asset: Asset) => {
+    masks.current.set(mask, asset);
+  }, []);
+  const reusePreview = useCallback(
+    (layers: PaintSession["frame"]["layers"], asset: Asset) => {
+      previews.current.set(layers, { asset, persisted: true });
+    },
+    [],
+  );
   useEffect(() => {
     const s = input.session;
     if (!s || s.revision === saved.current) return;
     if (!running.current) setStatus("Есть изменения");
-    if (s.transaction) return;
+    if (s.transaction || input.autoSave === false) return;
     const timer = setTimeout(() => void save(), 900);
     return () => clearTimeout(timer);
   }, [input.tick, input.session, save]);
@@ -118,7 +147,10 @@ export function usePaintSave(input: Input) {
       const s = latest.current.session;
       if (
         s &&
-        (s.revision !== saved.current || s.transaction || s.frame.selection)
+        (s.revision !== saved.current ||
+          s.transaction ||
+          s.frame.selection ||
+          (!latest.current.initialSaved && !!latest.current.sourceId))
       ) {
         e.preventDefault();
         e.returnValue = "";
@@ -127,5 +159,5 @@ export function usePaintSave(input: Input) {
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, []);
-  return { save, status };
+  return { save, status, reuseMask, reusePreview };
 }

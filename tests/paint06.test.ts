@@ -5,6 +5,7 @@ import {
   selectColor,
   growMask,
   strokeCoverage,
+  combineStrokeRegion,
   paintStroke,
   imagePoint,
   hasSelection,
@@ -102,6 +103,55 @@ describe("Выделение 2.0", () => {
     expect(result[155]).toBe(0);
     expect(result[156]).toBe(255);
     expect(original[155]).toBe(255);
+  });
+  it("кисть добавляет и стирает маску одним шагом истории на мазок", () => {
+    const session = new PaintSession(10, 10);
+    const added = new Uint8Array(100),
+      coverage = new Uint8Array(100);
+    const addRect = strokeCoverage(
+      coverage,
+      10,
+      10,
+      { x: 3.5, y: 5.5 },
+      { x: 6.5, y: 5.5 },
+      4,
+      1,
+    );
+    combineStrokeRegion(null, coverage, added, "add", 10, addRect);
+    session.change({ ...session.frame, selection: added });
+    expect(added[55]).toBe(255);
+    expect(added[0]).toBe(0);
+
+    const erased = added.slice(),
+      eraseCoverage = new Uint8Array(100);
+    const eraseRect = strokeCoverage(
+      eraseCoverage,
+      10,
+      10,
+      { x: 5.5, y: 5.5 },
+      { x: 5.5, y: 5.5 },
+      2,
+      1,
+    );
+    combineStrokeRegion(
+      added,
+      eraseCoverage,
+      erased,
+      "subtract",
+      10,
+      eraseRect,
+    );
+    session.change({ ...session.frame, selection: erased });
+    expect(erased[55]).toBe(0);
+    expect(added[55]).toBe(255);
+    session.undo();
+    expect(session.frame.selection).toEqual(added);
+    session.undo();
+    expect(session.frame.selection).toBeNull();
+    session.undo(true);
+    expect(session.frame.selection).toEqual(added);
+    session.undo(true);
+    expect(session.frame.selection).toEqual(erased);
   });
   it("переводит CSS-координаты в рабочие пиксели при масштабе и DPR", () => {
     expect(
