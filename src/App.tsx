@@ -208,7 +208,6 @@ export default function App() {
               <span className="online-dot" />
               Данные на этом устройстве
             </p>
-            <small>Без облака и подписок</small>
             <button
               onClick={() =>
                 void act(
